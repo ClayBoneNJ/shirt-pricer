@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 const PRICING_CONFIG = {
@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v3'
+const APP_VERSION = 'v4'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -184,6 +184,9 @@ const GRAPHIC_LAYOUTS = {
   },
 }
 
+const WHITE_BACKGROUND_THRESHOLD = 235
+const WHITE_BACKGROUND_SOFTNESS = 20
+
 const clampNumber = (value) => {
   const parsed = Number(value)
 
@@ -239,11 +242,74 @@ const getMinimumUnitPrice = (printLocations, quantityTierValue) => {
   return minimumUnitPrice
 }
 
+const loadImageFile = (file) =>
+  new Promise((resolve, reject) => {
+    const image = new Image()
+    const objectUrl = URL.createObjectURL(file)
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl)
+      resolve(image)
+    }
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      reject(new Error('Unable to load uploaded image.'))
+    }
+
+    image.src = objectUrl
+  })
+
+const removeWhiteBackgroundFromJpg = async (file) => {
+  const image = await loadImageFile(file)
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+
+  if (!context) {
+    return URL.createObjectURL(file)
+  }
+
+  canvas.width = image.naturalWidth
+  canvas.height = image.naturalHeight
+  context.drawImage(image, 0, 0)
+
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+  const { data } = imageData
+
+  for (let index = 0; index < data.length; index += 4) {
+    const red = data[index]
+    const green = data[index + 1]
+    const blue = data[index + 2]
+    const brightestChannel = Math.max(red, green, blue)
+    const darkestChannel = Math.min(red, green, blue)
+    const isNearWhite = brightestChannel >= WHITE_BACKGROUND_THRESHOLD
+    const isNeutral = brightestChannel - darkestChannel <= WHITE_BACKGROUND_SOFTNESS
+
+    if (!isNearWhite || !isNeutral) {
+      continue
+    }
+
+    const distanceFromWhite = 255 - brightestChannel
+    const alphaRatio = Math.min(
+      1,
+      Math.max(0, distanceFromWhite / WHITE_BACKGROUND_SOFTNESS),
+    )
+
+    data[index + 3] = Math.round(alphaRatio * 255)
+  }
+
+  context.putImageData(imageData, 0, 0)
+
+  return canvas.toDataURL('image/png')
+}
+
 function App() {
   const [form, setForm] = useState(createDefaultForm)
   const [graphics, setGraphics] = useState(DEFAULT_GRAPHICS)
   const [graphicPlacements, setGraphicPlacements] = useState({})
   const [dragState, setDragState] = useState(null)
+  const [isColorMenuOpen, setIsColorMenuOpen] = useState(false)
+  const colorPickerRef = useRef(null)
 
   const selection = useMemo(() => {
     const blankCost = clampNumber(form.blankCost)
@@ -328,9 +394,9 @@ function App() {
     setForm((current) => ({ ...current, quantity }))
   }
 
-  const handleShirtColorChange = (event) => {
-    const shirtColor = event.target.value
+  const handleShirtColorChange = (shirtColor) => {
     setForm((current) => ({ ...current, shirtColor }))
+    setIsColorMenuOpen(false)
   }
 
   const handlePrintToggle = (field) => (event) => {
@@ -347,14 +413,24 @@ function App() {
     }))
   }
 
-  const handleGraphicUpload = (field) => (event) => {
+  const handleGraphicUpload = (field) => async (event) => {
     const file = event.target.files?.[0]
 
     if (!file) {
       return
     }
 
-    const graphicUrl = URL.createObjectURL(file)
+    const isJpgUpload = /image\/jpeg|image\/jpg/i.test(file.type) || /\.jpe?g$/i.test(file.name)
+
+    let graphicUrl
+
+    try {
+      graphicUrl = isJpgUpload
+        ? await removeWhiteBackgroundFromJpg(file)
+        : URL.createObjectURL(file)
+    } catch {
+      graphicUrl = URL.createObjectURL(file)
+    }
 
     setGraphics((current) => ({
       ...current,
@@ -429,6 +505,32 @@ function App() {
       window.removeEventListener('pointerup', handlePointerUp)
     }
   }, [dragState])
+
+  useEffect(() => {
+    if (!isColorMenuOpen) {
+      return undefined
+    }
+
+    const handlePointerDown = (event) => {
+      if (!colorPickerRef.current?.contains(event.target)) {
+        setIsColorMenuOpen(false)
+      }
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsColorMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('keydown', handleEscape)
+    }
+  }, [isColorMenuOpen])
 
   return (
     <main className="app-shell">
@@ -721,22 +823,45 @@ function App() {
         <article className="glass-panel focus-panel preview-panel">
           <label className="field color-select-field">
             <span className="mini-label">Garment color</span>
-            <div className="color-select-wrap">
-              <span
-                className="color-chip selected-chip"
-                style={{ backgroundColor: selection.shirtColor.hex }}
-              />
-              <select
-                className="spotlight-control color-select"
-                value={form.shirtColor}
-                onChange={handleShirtColorChange}
+            <div className="color-picker" ref={colorPickerRef}>
+              <button
+                type="button"
+                className="spotlight-control color-picker-trigger"
+                aria-haspopup="listbox"
+                aria-expanded={isColorMenuOpen}
+                onClick={() => setIsColorMenuOpen((current) => !current)}
               >
-                {SHIRT_COLORS.map((color) => (
-                  <option key={color.value} value={color.value}>
-                    {`\u25cf ${color.label}`}
-                  </option>
-                ))}
-              </select>
+                <span
+                  className="color-chip"
+                  style={{ backgroundColor: selection.shirtColor.hex }}
+                />
+                <span className="color-picker-label">{selection.shirtColor.label}</span>
+                <span className={`color-picker-caret ${isColorMenuOpen ? 'open' : ''}`}>
+                  ▾
+                </span>
+              </button>
+              {isColorMenuOpen ? (
+                <div className="color-picker-menu" role="listbox" aria-label="Garment color">
+                  {SHIRT_COLORS.map((color) => (
+                    <button
+                      key={color.value}
+                      type="button"
+                      role="option"
+                      aria-selected={form.shirtColor === color.value}
+                      className={`color-picker-option ${
+                        form.shirtColor === color.value ? 'active' : ''
+                      }`}
+                      onClick={() => handleShirtColorChange(color.value)}
+                    >
+                      <span
+                        className="color-chip"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span>{color.label}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </label>
 
