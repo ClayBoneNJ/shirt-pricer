@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v2'
+const APP_VERSION = 'v3'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -733,7 +733,7 @@ function App() {
               >
                 {SHIRT_COLORS.map((color) => (
                   <option key={color.value} value={color.value}>
-                    {color.label}
+                    {`\u25cf ${color.label}`}
                   </option>
                 ))}
               </select>
