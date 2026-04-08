@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v11'
+const APP_VERSION = 'v12'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -798,8 +798,8 @@ function App() {
                 <span>Front Graphic</span>
                 <small>
                   {form.printLocations.leftBreast
-                    ? `${formatMoney(selection.leftBreastCost)} at 4 in`
-                    : `${formatMoney(selection.fullFrontCost)} at 11 in`}
+                    ? formatMoney(selection.leftBreastCost)
+                    : formatMoney(selection.fullFrontCost)}
                 </small>
                 <div className="front-size-switch">
                   <button
@@ -835,10 +835,7 @@ function App() {
                       onChange={handleFrontGraphicUpload}
                     />
                   </label>
-                  <small className="upload-meta">
-                    {sharedFrontGraphic?.name ??
-                      (form.printLocations.leftBreast ? '4 in wide' : '11 in wide')}
-                  </small>
+                  <small className="upload-meta">{sharedFrontGraphic?.name ?? ''}</small>
                 </div>
               </label>
 
@@ -862,9 +859,7 @@ function App() {
                       onChange={handleGraphicUpload('leftSleeve')}
                     />
                   </label>
-                  <small className="upload-meta">
-                    {graphics.leftSleeve?.name ?? '4 in wide'}
-                  </small>
+                  <small className="upload-meta">{graphics.leftSleeve?.name ?? ''}</small>
                 </div>
               </label>
 
@@ -888,9 +883,7 @@ function App() {
                       onChange={handleGraphicUpload('rightSleeve')}
                     />
                   </label>
-                  <small className="upload-meta">
-                    {graphics.rightSleeve?.name ?? '4 in wide'}
-                  </small>
+                  <small className="upload-meta">{graphics.rightSleeve?.name ?? ''}</small>
                 </div>
               </label>
 
@@ -914,9 +907,7 @@ function App() {
                       onChange={handleGraphicUpload('fullBack')}
                     />
                   </label>
-                  <small className="upload-meta">
-                    {graphics.fullBack?.name ?? '11 in wide'}
-                  </small>
+                  <small className="upload-meta">{graphics.fullBack?.name ?? ''}</small>
                 </div>
               </label>
             </div>

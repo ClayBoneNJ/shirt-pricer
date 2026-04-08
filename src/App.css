@@ -295,14 +295,14 @@
 }
 
 .layout-row {
-  gap: 10px;
-  padding: 16px;
+  gap: 8px;
+  padding: 14px;
 }
 
 .layout-toggle-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .color-select-field {
@@ -496,40 +496,47 @@
 }
 
 .compact-toggle-card {
-  gap: 6px;
-  padding: 14px;
-  border-radius: 22px;
+  gap: 4px;
+  padding: 11px 12px;
+  border-radius: 18px;
 }
 
 .compact-toggle-card span {
-  font-size: 0.92rem;
+  font-size: 0.88rem;
 }
 
 .compact-toggle-card small,
 .compact-toggle-card .upload-meta {
-  font-size: 0.74rem;
+  font-size: 0.7rem;
+  min-height: 1em;
 }
 
 .compact-toggle-card .upload-button {
-  min-height: 32px;
-  font-size: 0.76rem;
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 0.72rem;
+}
+
+.compact-toggle-card .upload-row {
+  gap: 6px;
+  margin-top: 2px;
 }
 
 .front-size-switch {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .size-chip {
-  min-height: 30px;
-  padding: 0 10px;
+  min-height: 26px;
+  padding: 0 8px;
   border: 1px solid rgba(173, 204, 255, 0.12);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted-strong);
   font: inherit;
-  font-size: 0.76rem;
+  font-size: 0.7rem;
   font-weight: 700;
   cursor: pointer;
 }
