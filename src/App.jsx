@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v15'
+const APP_VERSION = 'v16'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -449,6 +449,9 @@ function App() {
       minimumUnitPrice,
       ROCK_BOTTOM_UNIT_PRICE,
     )
+    const customerPrice = unitPrice * quantity
+    const totalCost = unitCost * quantity
+    const profit = customerPrice - totalCost
 
     return {
       garmentLabel: PRICING_CONFIG.blankPrices[form.apparelType].label,
@@ -470,6 +473,9 @@ function App() {
       unitCost,
       minimumUnitPrice,
       unitPrice,
+      customerPrice,
+      totalCost,
+      profit,
     }
   }, [form])
 
@@ -1009,100 +1015,37 @@ function App() {
           </div>
         </article>
 
-        <section className="focus-grid">
-          <article className="glass-panel focus-panel garment-panel">
-            <div className="section-heading">
-              <span className="panel-kicker">Overview</span>
-              <h2>Price snapshot</h2>
-              <p>
-                Garment, quantity, and pricing stay together here while you build the job.
-              </p>
+        <section className="glass-panel focus-panel pricing-summary-panel">
+          <div className="pricing-summary-grid">
+            <div>
+              <p className="mini-label">Garment cost</p>
+              <strong>{formatMoney(selection.blankCost)}</strong>
             </div>
-
-            <div className="glass-band overview-band">
-              <div>
-                <p className="mini-label">Selected garment</p>
-                <strong>{selection.garmentLabel}</strong>
-              </div>
-              <div>
-                <p className="mini-label">Garment color</p>
-                <strong>{selection.shirtColor.label}</strong>
-              </div>
-              <div>
-                <p className="mini-label">Quantity tier</p>
-                <strong>{selection.quantityTier.label}</strong>
-              </div>
-              <div>
-                <p className="mini-label">Actual quantity</p>
-                <strong>{selection.quantity}</strong>
-              </div>
-              <div>
-                <p className="mini-label">Default blank cost</p>
-                <strong>{formatMoney(selection.blankCost)}</strong>
-              </div>
-              <div>
-                <p className="mini-label">Tier multiplier</p>
-                <strong>{selection.quantityTier.multiplier.toFixed(2)}x</strong>
-              </div>
-              <div>
-                <p className="mini-label">Unit cost</p>
-                <strong>{formatMoney(selection.unitCost)}</strong>
-              </div>
-              <div>
-                <p className="mini-label">Sell price</p>
-                <strong>{formatMoney(selection.unitPrice)}</strong>
-              </div>
+            <div>
+              <p className="mini-label">Graphics cost</p>
+              <strong>{formatMoney(selection.decorationCost)}</strong>
             </div>
-
-            <p className="garment-note">{selection.garmentNote}</p>
-          </article>
-
-          <article className="glass-panel focus-panel deco-panel">
-            <div className="section-heading">
-              <span className="panel-kicker">Layout</span>
-              <h2>Layout summary</h2>
-              <p>
-                Active placements and pricing update here while you fine-tune the artwork.
-              </p>
+            <div>
+              <p className="mini-label">Total cost</p>
+              <strong>{formatMoney(selection.unitCost)}</strong>
             </div>
-
-            <div className="layout-summary-pills">
-              <span className="summary-pill">
-                Active locations <strong>{selection.activeDecorations.length}</strong>
-              </span>
-              <span className="summary-pill">
-                Layout cost <strong>{formatMoney(selection.decorationCost)}</strong>
-              </span>
-              <span className="summary-pill">
-                Unit price <strong>{formatMoney(selection.unitPrice)}</strong>
-              </span>
+            <div>
+              <p className="mini-label">Multiplier</p>
+              <strong>{selection.quantityTier.multiplier.toFixed(2)}x</strong>
             </div>
-
-            <div className="glass-band active-layout">
-              <span className="mini-label">Current layout</span>
-              <div className="active-tags">
-                {selection.activeDecorations.length ? (
-                  selection.activeDecorations.map((item) => (
-                    <span key={item} className="active-tag">
-                      {item}
-                    </span>
-                  ))
-                ) : (
-                  <span className="active-tag muted">No decoration selected</span>
-                )}
-              </div>
-              {selection.minimumUnitPrice > 0 ? (
-                <p className="pricing-note">
-                  Minimum applied: {formatMoney(selection.minimumUnitPrice)} for this
-                  layout.
-                </p>
-              ) : selection.unitPrice === ROCK_BOTTOM_UNIT_PRICE ? (
-                <p className="pricing-note">
-                  Rock-bottom floor applied: {formatMoney(ROCK_BOTTOM_UNIT_PRICE)}.
-                </p>
-              ) : null}
+            <div>
+              <p className="mini-label">Suggested sale price</p>
+              <strong>{formatMoney(selection.unitPrice)}</strong>
             </div>
-          </article>
+            <div>
+              <p className="mini-label">Customer price</p>
+              <strong>{formatMoney(selection.customerPrice)}</strong>
+            </div>
+            <div>
+              <p className="mini-label">Profit</p>
+              <strong>{formatMoney(selection.profit)}</strong>
+            </div>
+          </div>
         </section>
 
       </section>

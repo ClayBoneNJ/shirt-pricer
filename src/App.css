@@ -442,6 +442,38 @@
   line-height: 1.7;
 }
 
+.pricing-summary-panel {
+  gap: 0;
+}
+
+.pricing-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.pricing-summary-grid > div {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(173, 204, 255, 0.08);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(126, 224, 200, 0.08), rgba(137, 168, 255, 0.06)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.pricing-summary-grid p {
+  margin: 0 0 6px;
+}
+
+.pricing-summary-grid strong {
+  display: block;
+  color: var(--heading);
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
 .toggle-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -629,8 +661,8 @@
 }
 
 @media (max-width: 980px) {
-  .focus-grid {
-    grid-template-columns: 1fr;
+  .pricing-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -890,6 +922,20 @@
   .overview-card h3,
   .pricing-band h3 {
     font-size: 1.45rem;
+  }
+
+  .pricing-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .pricing-summary-grid > div {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .pricing-summary-grid strong {
+    font-size: 1rem;
   }
 
   .toggle-grid,
