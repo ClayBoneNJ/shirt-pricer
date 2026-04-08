@@ -26,6 +26,8 @@ const PRICING_CONFIG = {
 
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
+const ASSET_BASE_URL = import.meta.env.BASE_URL
+const APP_VERSION = 'v2'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -288,8 +290,8 @@ function App() {
       garmentNote: GARMENT_NOTES[form.apparelType],
       shirtColor: {
         ...shirtColor,
-        frontImage: `/shirts/${garmentImagePrefix}${shirtColor.value}-front.png`,
-        backImage: `/shirts/${garmentImagePrefix}${shirtColor.value}-back.png`,
+        frontImage: `${ASSET_BASE_URL}shirts/${garmentImagePrefix}${shirtColor.value}-front.png`,
+        backImage: `${ASSET_BASE_URL}shirts/${garmentImagePrefix}${shirtColor.value}-back.png`,
       },
       quantityTier,
       quantity,
@@ -431,6 +433,18 @@ function App() {
   return (
     <main className="app-shell">
       <section className="studio-shell">
+        <article className="glass-panel hero-panel">
+          <div className="hero-copy">
+            <span className="panel-kicker">DTF Apparel Pricer</span>
+            <h1>
+              Shirt Pricer <span className="version-badge">{APP_VERSION}</span>
+            </h1>
+            <p>
+              Live pricing, layout previews, and garment mockups for quick quoting.
+            </p>
+          </div>
+        </article>
+
         <section className="focus-grid">
           <article className="glass-panel focus-panel garment-panel">
             <div className="section-heading">
