@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v5'
+const APP_VERSION = 'v6'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -184,8 +184,8 @@ const GRAPHIC_LAYOUTS = {
   },
 }
 
-const WHITE_BACKGROUND_THRESHOLD = 220
-const WHITE_BACKGROUND_SOFTNESS = 35
+const WHITE_BACKGROUND_THRESHOLD = 190
+const WHITE_BACKGROUND_SOFTNESS = 70
 
 const clampNumber = (value) => {
   const parsed = Number(value)
@@ -344,6 +344,10 @@ const removeWhiteBackgroundFromJpg = async (file) => {
     enqueue(x + 1, y)
     enqueue(x, y - 1)
     enqueue(x, y + 1)
+    enqueue(x - 1, y - 1)
+    enqueue(x + 1, y - 1)
+    enqueue(x - 1, y + 1)
+    enqueue(x + 1, y + 1)
   }
 
   context.putImageData(imageData, 0, 0)
