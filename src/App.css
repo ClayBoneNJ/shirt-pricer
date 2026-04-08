@@ -695,51 +695,50 @@
 
 @media (max-width: 620px) {
   .app-shell {
-    width: min(100% - 14px, 100%);
-    padding-top: 12px;
-    padding-bottom: 18px;
+    width: min(100% - 10px, 100%);
+    padding-top: 8px;
+    padding-bottom: 14px;
   }
 
   .studio-shell {
-    gap: 12px;
+    gap: 10px;
   }
 
   .focus-panel {
-    gap: 12px;
-    padding: 14px;
-    border-radius: 20px;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 18px;
   }
 
   .hero-panel {
-    gap: 10px;
-    padding: 16px 14px;
-    border-radius: 20px;
+    gap: 6px;
+    padding: 12px;
+    border-radius: 18px;
   }
 
   .hero-copy {
-    gap: 6px;
+    gap: 4px;
   }
 
   .hero-copy h1 {
-    font-size: clamp(1.7rem, 8vw, 2.25rem);
-    line-height: 1.12;
+    font-size: clamp(1.45rem, 7vw, 1.9rem);
+    line-height: 1.08;
   }
 
   .hero-copy p {
-    font-size: 0.92rem;
-    line-height: 1.45;
+    display: none;
   }
 
   .version-badge {
     margin-left: 6px;
-    padding: 5px 10px;
+    padding: 4px 8px;
   }
 
   .panel-kicker {
-    min-height: 28px;
-    margin-bottom: 8px;
-    padding: 0 10px;
-    font-size: 0.66rem;
+    min-height: 24px;
+    margin-bottom: 4px;
+    padding: 0 8px;
+    font-size: 0.6rem;
     letter-spacing: 0.14em;
   }
 
@@ -769,33 +768,34 @@
   .field input,
   .field select,
   .color-picker-trigger {
-    min-height: 46px;
-    padding: 0 14px;
-    font-size: 0.95rem;
+    min-height: 42px;
+    padding: 0 12px;
+    font-size: 0.9rem;
   }
 
   .garment-select,
   .tier-select {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .preview-panel {
-    gap: 10px;
+    gap: 8px;
   }
 
   .preview-controls {
-    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 6px;
   }
 
   .glass-band {
     gap: 8px;
-    padding: 10px;
-    border-radius: 20px;
+    padding: 8px;
+    border-radius: 18px;
   }
 
   .layout-row {
     gap: 6px;
-    padding: 10px;
+    padding: 8px;
   }
 
   .layout-summary-pills,
@@ -811,13 +811,14 @@
   }
 
   .layout-toggle-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
   }
 
   .compact-toggle-card {
     gap: 3px;
-    padding: 9px 10px;
-    border-radius: 16px;
+    padding: 8px;
+    border-radius: 14px;
   }
 
   .compact-card-header {
@@ -830,19 +831,19 @@
   }
 
   .compact-toggle-card span {
-    font-size: 0.82rem;
+    font-size: 0.76rem;
   }
 
   .compact-toggle-card small,
   .compact-toggle-card .upload-meta,
   .size-chip {
-    font-size: 0.66rem;
+    font-size: 0.62rem;
   }
 
   .compact-toggle-card .upload-button {
-    min-height: 25px;
+    min-height: 23px;
     padding: 0 8px;
-    font-size: 0.68rem;
+    font-size: 0.64rem;
   }
 
   .front-size-switch {
@@ -855,17 +856,17 @@
   }
 
   .mockup-band {
-    padding: 12px;
+    padding: 10px;
   }
 
   .mockup-stage {
-    min-height: 300px;
-    padding: 10px 10px 12px;
-    border-radius: 18px;
+    min-height: 260px;
+    padding: 8px 8px 10px;
+    border-radius: 16px;
   }
 
   .mockup-gallery {
-    gap: 10px;
+    gap: 8px;
   }
 
   .mockup-caption {
@@ -874,12 +875,12 @@
   }
 
   .mockup-canvas {
-    width: min(100%, 270px);
+    width: min(100%, 220px);
   }
 
   .overview-card,
   .pricing-band {
-    gap: 10px;
+    gap: 8px;
   }
 
   .overview-band {
@@ -892,10 +893,8 @@
   }
 
   .toggle-grid,
-  .layout-toggle-row,
   .mockup-gallery,
   .overview-band,
-  .preview-controls,
   .garment-preview,
   .pricing-band {
     grid-template-columns: 1fr;
