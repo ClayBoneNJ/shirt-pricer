@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v8'
+const APP_VERSION = 'v9'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -647,7 +647,8 @@ function App() {
         </article>
 
         <article className="glass-panel focus-panel preview-panel">
-          <label className="field color-select-field">
+          <div className="preview-controls">
+            <label className="field color-select-field">
             <span className="mini-label">Garment color</span>
             <div className="color-picker" ref={colorPickerRef}>
               <button
@@ -690,6 +691,48 @@ function App() {
               ) : null}
             </div>
           </label>
+
+            <label className="field preview-control-field">
+              <span>Garment type</span>
+              <select
+                className="spotlight-control garment-select"
+                value={form.apparelType}
+                onChange={handleApparelChange}
+              >
+                {Object.entries(PRICING_CONFIG.blankPrices).map(([value, item]) => (
+                  <option key={value} value={value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="field preview-control-field">
+              <span>Quantity tier</span>
+              <select
+                className="spotlight-control tier-select"
+                value={form.quantityTier}
+                onChange={handleQuantityTierChange}
+              >
+                {PRICING_CONFIG.quantityBreaks.map((tier) => (
+                  <option key={tier.value} value={tier.value}>
+                    {tier.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="field preview-control-field">
+              <span>Actual quantity</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.quantity}
+                onChange={handleQuantityChange}
+                placeholder="24"
+              />
+            </label>
+          </div>
 
           <div className="glass-band mockup-band">
             <div className="mockup-gallery">
@@ -782,53 +825,12 @@ function App() {
         <section className="focus-grid">
           <article className="glass-panel focus-panel garment-panel">
             <div className="section-heading">
-              <span className="panel-kicker">Garment</span>
-              <h2>Pick the blank</h2>
+              <span className="panel-kicker">Overview</span>
+              <h2>Price snapshot</h2>
               <p>
-                Start with the garment choice, then let the layout follow the job.
+                Garment, quantity, and pricing stay together here while you build the job.
               </p>
             </div>
-
-            <label className="field field-stack">
-              <span>Garment type</span>
-              <select
-                className="spotlight-control garment-select"
-                value={form.apparelType}
-                onChange={handleApparelChange}
-              >
-                {Object.entries(PRICING_CONFIG.blankPrices).map(([value, item]) => (
-                  <option key={value} value={value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field field-stack">
-              <span>Quantity tier</span>
-              <select
-                className="spotlight-control tier-select"
-                value={form.quantityTier}
-                onChange={handleQuantityTierChange}
-              >
-                {PRICING_CONFIG.quantityBreaks.map((tier) => (
-                  <option key={tier.value} value={tier.value}>
-                    {tier.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field field-stack">
-              <span>Actual quantity</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={form.quantity}
-                onChange={handleQuantityChange}
-                placeholder="24"
-              />
-            </label>
 
             <div className="glass-band overview-band">
               <div>

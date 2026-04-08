@@ -287,8 +287,19 @@
   gap: 16px;
 }
 
+.preview-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.2fr) repeat(3, minmax(160px, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
 .color-select-field {
-  width: min(240px, 100%);
+  width: 100%;
+}
+
+.preview-control-field {
+  width: 100%;
 }
 
 .color-picker {
@@ -572,6 +583,7 @@
   .toggle-grid,
   .mockup-gallery,
   .overview-band,
+  .preview-controls,
   .garment-preview,
   .pricing-band {
     grid-template-columns: 1fr;
