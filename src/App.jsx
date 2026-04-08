@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v9'
+const APP_VERSION = 'v10'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -734,6 +734,141 @@ function App() {
             </label>
           </div>
 
+          <div className="glass-band layout-row">
+            <span className="mini-label">Layout graphics</span>
+            <div className="layout-toggle-row">
+              <label className="toggle-card compact-toggle-card">
+                <input
+                  type="checkbox"
+                  checked={form.printLocations.leftBreast}
+                  onChange={handlePrintToggle('leftBreast')}
+                />
+                <span>Left Breast</span>
+                <small>{formatMoney(selection.leftBreastCost)} each</small>
+                <div
+                  className="upload-row"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <label className="upload-button">
+                    Upload graphic
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGraphicUpload('leftBreast')}
+                    />
+                  </label>
+                  <small className="upload-meta">
+                    {graphics.leftBreast?.name ?? '4 in wide'}
+                  </small>
+                </div>
+              </label>
+
+              <label className="toggle-card compact-toggle-card">
+                <input
+                  type="checkbox"
+                  checked={form.printLocations.fullFront}
+                  onChange={handlePrintToggle('fullFront')}
+                />
+                <span>Full Front</span>
+                <small>{formatMoney(selection.fullFrontCost)} each</small>
+                <div
+                  className="upload-row"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <label className="upload-button">
+                    Upload graphic
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGraphicUpload('fullFront')}
+                    />
+                  </label>
+                  <small className="upload-meta">
+                    {graphics.fullFront?.name ?? '11 in wide'}
+                  </small>
+                </div>
+              </label>
+
+              <label className="toggle-card compact-toggle-card">
+                <input
+                  type="checkbox"
+                  checked={form.printLocations.leftSleeve}
+                  onChange={handlePrintToggle('leftSleeve')}
+                />
+                <span>Left Sleeve</span>
+                <small>{formatMoney(selection.sleeveCost)} per sleeve</small>
+                <div
+                  className="upload-row"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <label className="upload-button">
+                    Upload graphic
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGraphicUpload('leftSleeve')}
+                    />
+                  </label>
+                  <small className="upload-meta">
+                    {graphics.leftSleeve?.name ?? '4 in wide'}
+                  </small>
+                </div>
+              </label>
+
+              <label className="toggle-card compact-toggle-card">
+                <input
+                  type="checkbox"
+                  checked={form.printLocations.rightSleeve}
+                  onChange={handlePrintToggle('rightSleeve')}
+                />
+                <span>Right Sleeve</span>
+                <small>{formatMoney(selection.sleeveCost)} per sleeve</small>
+                <div
+                  className="upload-row"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <label className="upload-button">
+                    Upload graphic
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGraphicUpload('rightSleeve')}
+                    />
+                  </label>
+                  <small className="upload-meta">
+                    {graphics.rightSleeve?.name ?? '4 in wide'}
+                  </small>
+                </div>
+              </label>
+
+              <label className="toggle-card compact-toggle-card">
+                <input
+                  type="checkbox"
+                  checked={form.printLocations.fullBack}
+                  onChange={handlePrintToggle('fullBack')}
+                />
+                <span>Full Back</span>
+                <small>{formatMoney(selection.fullBackCost)} each</small>
+                <div
+                  className="upload-row"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <label className="upload-button">
+                    Upload graphic
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGraphicUpload('fullBack')}
+                    />
+                  </label>
+                  <small className="upload-meta">
+                    {graphics.fullBack?.name ?? '11 in wide'}
+                  </small>
+                </div>
+              </label>
+            </div>
+          </div>
+
           <div className="glass-band mockup-band">
             <div className="mockup-gallery">
               <figure className="mockup-stage">
@@ -872,11 +1007,10 @@ function App() {
 
           <article className="glass-panel focus-panel deco-panel">
             <div className="section-heading">
-              <span className="panel-kicker">Decoration</span>
-              <h2>Build the layout</h2>
+              <span className="panel-kicker">Layout</span>
+              <h2>Layout summary</h2>
               <p>
-                Turn on the placements you need and the layout cost updates
-                instantly.
+                Active placements and pricing update here while you fine-tune the artwork.
               </p>
             </div>
 
@@ -890,138 +1024,6 @@ function App() {
               <span className="summary-pill">
                 Unit price <strong>{formatMoney(selection.unitPrice)}</strong>
               </span>
-            </div>
-
-            <div className="toggle-grid">
-              <label className="toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.leftBreast}
-                  onChange={handlePrintToggle('leftBreast')}
-                />
-                <span>Left Breast</span>
-                <small>{formatMoney(selection.leftBreastCost)} each</small>
-                <div
-                  className="upload-row"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <label className="upload-button">
-                    Upload graphic
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleGraphicUpload('leftBreast')}
-                    />
-                  </label>
-                  <small className="upload-meta">
-                    {graphics.leftBreast?.name ?? '4 in wide'}
-                  </small>
-                </div>
-              </label>
-
-              <label className="toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.fullFront}
-                  onChange={handlePrintToggle('fullFront')}
-                />
-                <span>Full Front</span>
-                <small>{formatMoney(selection.fullFrontCost)} each</small>
-                <div
-                  className="upload-row"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <label className="upload-button">
-                    Upload graphic
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleGraphicUpload('fullFront')}
-                    />
-                  </label>
-                  <small className="upload-meta">
-                    {graphics.fullFront?.name ?? '11 in wide'}
-                  </small>
-                </div>
-              </label>
-
-              <label className="toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.leftSleeve}
-                  onChange={handlePrintToggle('leftSleeve')}
-                />
-                <span>Left Sleeve</span>
-                <small>{formatMoney(selection.sleeveCost)} per sleeve</small>
-                <div
-                  className="upload-row"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <label className="upload-button">
-                    Upload graphic
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleGraphicUpload('leftSleeve')}
-                    />
-                  </label>
-                  <small className="upload-meta">
-                    {graphics.leftSleeve?.name ?? '4 in wide'}
-                  </small>
-                </div>
-              </label>
-
-              <label className="toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.rightSleeve}
-                  onChange={handlePrintToggle('rightSleeve')}
-                />
-                <span>Right Sleeve</span>
-                <small>{formatMoney(selection.sleeveCost)} per sleeve</small>
-                <div
-                  className="upload-row"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <label className="upload-button">
-                    Upload graphic
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleGraphicUpload('rightSleeve')}
-                    />
-                  </label>
-                  <small className="upload-meta">
-                    {graphics.rightSleeve?.name ?? '4 in wide'}
-                  </small>
-                </div>
-              </label>
-
-              <label className="toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.fullBack}
-                  onChange={handlePrintToggle('fullBack')}
-                />
-                <span>Full Back</span>
-                <small>{formatMoney(selection.fullBackCost)} each</small>
-                <div
-                  className="upload-row"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <label className="upload-button">
-                    Upload graphic
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleGraphicUpload('fullBack')}
-                    />
-                  </label>
-                  <small className="upload-meta">
-                    {graphics.fullBack?.name ?? '11 in wide'}
-                  </small>
-                </div>
-              </label>
             </div>
 
             <div className="glass-band active-layout">

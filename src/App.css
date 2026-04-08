@@ -294,6 +294,17 @@
   align-items: end;
 }
 
+.layout-row {
+  gap: 10px;
+  padding: 16px;
+}
+
+.layout-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .color-select-field {
   width: 100%;
 }
@@ -484,6 +495,26 @@
   color: var(--muted);
 }
 
+.compact-toggle-card {
+  gap: 6px;
+  padding: 14px;
+  border-radius: 22px;
+}
+
+.compact-toggle-card span {
+  font-size: 0.92rem;
+}
+
+.compact-toggle-card small,
+.compact-toggle-card .upload-meta {
+  font-size: 0.74rem;
+}
+
+.compact-toggle-card .upload-button {
+  min-height: 32px;
+  font-size: 0.76rem;
+}
+
 .upload-row {
   display: grid;
   gap: 8px;
@@ -581,6 +612,7 @@
   }
 
   .toggle-grid,
+  .layout-toggle-row,
   .mockup-gallery,
   .overview-band,
   .preview-controls,
