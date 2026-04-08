@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v4'
+const APP_VERSION = 'v5'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -184,8 +184,8 @@ const GRAPHIC_LAYOUTS = {
   },
 }
 
-const WHITE_BACKGROUND_THRESHOLD = 235
-const WHITE_BACKGROUND_SOFTNESS = 20
+const WHITE_BACKGROUND_THRESHOLD = 220
+const WHITE_BACKGROUND_SOFTNESS = 35
 
 const clampNumber = (value) => {
   const parsed = Number(value)
@@ -260,6 +260,19 @@ const loadImageFile = (file) =>
     image.src = objectUrl
   })
 
+const isNearWhitePixel = (data, index) => {
+  const red = data[index]
+  const green = data[index + 1]
+  const blue = data[index + 2]
+  const brightestChannel = Math.max(red, green, blue)
+  const darkestChannel = Math.min(red, green, blue)
+
+  return (
+    brightestChannel >= WHITE_BACKGROUND_THRESHOLD &&
+    brightestChannel - darkestChannel <= WHITE_BACKGROUND_SOFTNESS
+  )
+}
+
 const removeWhiteBackgroundFromJpg = async (file) => {
   const image = await loadImageFile(file)
   const canvas = document.createElement('canvas')
@@ -275,27 +288,62 @@ const removeWhiteBackgroundFromJpg = async (file) => {
 
   const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
   const { data } = imageData
+  const width = canvas.width
+  const height = canvas.height
+  const visited = new Uint8Array(width * height)
+  const queue = []
 
-  for (let index = 0; index < data.length; index += 4) {
-    const red = data[index]
-    const green = data[index + 1]
-    const blue = data[index + 2]
-    const brightestChannel = Math.max(red, green, blue)
-    const darkestChannel = Math.min(red, green, blue)
-    const isNearWhite = brightestChannel >= WHITE_BACKGROUND_THRESHOLD
-    const isNeutral = brightestChannel - darkestChannel <= WHITE_BACKGROUND_SOFTNESS
-
-    if (!isNearWhite || !isNeutral) {
-      continue
+  const enqueue = (x, y) => {
+    if (x < 0 || y < 0 || x >= width || y >= height) {
+      return
     }
 
-    const distanceFromWhite = 255 - brightestChannel
+    const pixelIndex = y * width + x
+
+    if (visited[pixelIndex]) {
+      return
+    }
+
+    const dataIndex = pixelIndex * 4
+
+    if (!isNearWhitePixel(data, dataIndex)) {
+      return
+    }
+
+    visited[pixelIndex] = 1
+    queue.push(pixelIndex)
+  }
+
+  for (let x = 0; x < width; x += 1) {
+    enqueue(x, 0)
+    enqueue(x, height - 1)
+  }
+
+  for (let y = 0; y < height; y += 1) {
+    enqueue(0, y)
+    enqueue(width - 1, y)
+  }
+
+  for (let pointer = 0; pointer < queue.length; pointer += 1) {
+    const pixelIndex = queue[pointer]
+    const x = pixelIndex % width
+    const y = Math.floor(pixelIndex / width)
+    const dataIndex = pixelIndex * 4
+    const red = data[dataIndex]
+    const green = data[dataIndex + 1]
+    const blue = data[dataIndex + 2]
+    const brightestChannel = Math.max(red, green, blue)
     const alphaRatio = Math.min(
       1,
-      Math.max(0, distanceFromWhite / WHITE_BACKGROUND_SOFTNESS),
+      Math.max(0, (255 - brightestChannel) / WHITE_BACKGROUND_SOFTNESS),
     )
 
-    data[index + 3] = Math.round(alphaRatio * 255)
+    data[dataIndex + 3] = Math.round(alphaRatio * 255)
+
+    enqueue(x - 1, y)
+    enqueue(x + 1, y)
+    enqueue(x, y - 1)
+    enqueue(x, y + 1)
   }
 
   context.putImageData(imageData, 0, 0)
