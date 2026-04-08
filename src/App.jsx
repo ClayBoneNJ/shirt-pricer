@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v7'
+const APP_VERSION = 'v8'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -646,6 +646,139 @@ function App() {
           </div>
         </article>
 
+        <article className="glass-panel focus-panel preview-panel">
+          <label className="field color-select-field">
+            <span className="mini-label">Garment color</span>
+            <div className="color-picker" ref={colorPickerRef}>
+              <button
+                type="button"
+                className="spotlight-control color-picker-trigger"
+                aria-haspopup="listbox"
+                aria-expanded={isColorMenuOpen}
+                onClick={() => setIsColorMenuOpen((current) => !current)}
+              >
+                <span
+                  className="color-chip"
+                  style={{ backgroundColor: selection.shirtColor.hex }}
+                />
+                <span className="color-picker-label">{selection.shirtColor.label}</span>
+                <span className={`color-picker-caret ${isColorMenuOpen ? 'open' : ''}`}>
+                  ▾
+                </span>
+              </button>
+              {isColorMenuOpen ? (
+                <div className="color-picker-menu" role="listbox" aria-label="Garment color">
+                  {SHIRT_COLORS.map((color) => (
+                    <button
+                      key={color.value}
+                      type="button"
+                      role="option"
+                      aria-selected={form.shirtColor === color.value}
+                      className={`color-picker-option ${
+                        form.shirtColor === color.value ? 'active' : ''
+                      }`}
+                      onClick={() => handleShirtColorChange(color.value)}
+                    >
+                      <span
+                        className="color-chip"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span>{color.label}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </label>
+
+          <div className="glass-band mockup-band">
+            <div className="mockup-gallery">
+              <figure className="mockup-stage">
+                <figcaption className="mockup-caption">Front</figcaption>
+                <div className="mockup-frame">
+                  <div className="mockup-canvas">
+                    <img
+                      src={selection.shirtColor.frontImage}
+                      alt={`${selection.shirtColor.label} shirt front`}
+                      className="shirt-mockup-image"
+                    />
+                    {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
+                      if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
+                        return null
+                      }
+
+                      const placement = graphicPlacements[field] ?? config
+
+                      return (
+                        <div
+                          key={field}
+                          className={`graphic-overlay ${dragState?.field === field ? 'dragging' : ''}`}
+                          title={`${field} graphic at ${config.widthLabel}`}
+                          style={{
+                            left: `${placement.x}%`,
+                            top: `${placement.y}%`,
+                            width: `${placement.width}%`,
+                            transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
+                          }}
+                          onPointerDown={handleGraphicPointerDown(field)}
+                        >
+                          <img
+                            src={graphics[field].url}
+                            alt={graphics[field].name}
+                            className="graphic-overlay-image"
+                            draggable="false"
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </figure>
+              <figure className="mockup-stage">
+                <figcaption className="mockup-caption">Back</figcaption>
+                <div className="mockup-frame">
+                  <div className="mockup-canvas">
+                    <img
+                      src={selection.shirtColor.backImage}
+                      alt={`${selection.shirtColor.label} shirt back`}
+                      className="shirt-mockup-image"
+                    />
+                    {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
+                      if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
+                        return null
+                      }
+
+                      const placement = graphicPlacements[field] ?? config
+
+                      return (
+                        <div
+                          key={field}
+                          className={`graphic-overlay ${dragState?.field === field ? 'dragging' : ''}`}
+                          title={`${field} graphic at ${config.widthLabel}`}
+                          style={{
+                            left: `${placement.x}%`,
+                            top: `${placement.y}%`,
+                            width: `${placement.width}%`,
+                            transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
+                          }}
+                          onPointerDown={handleGraphicPointerDown(field)}
+                        >
+                          <img
+                            src={graphics[field].url}
+                            alt={graphics[field].name}
+                            className="graphic-overlay-image"
+                            draggable="false"
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </figure>
+            </div>
+          </div>
+        </article>
+
         <section className="focus-grid">
           <article className="glass-panel focus-panel garment-panel">
             <div className="section-heading">
@@ -697,7 +830,7 @@ function App() {
               />
             </label>
 
-            <div className="glass-band garment-preview">
+            <div className="glass-band overview-band">
               <div>
                 <p className="mini-label">Selected garment</p>
                 <strong>{selection.garmentLabel}</strong>
@@ -722,9 +855,6 @@ function App() {
                 <p className="mini-label">Tier multiplier</p>
                 <strong>{selection.quantityTier.multiplier.toFixed(2)}x</strong>
               </div>
-            </div>
-
-            <div className="glass-band pricing-band">
               <div>
                 <p className="mini-label">Unit cost</p>
                 <strong>{formatMoney(selection.unitCost)}</strong>
@@ -919,138 +1049,6 @@ function App() {
           </article>
         </section>
 
-        <article className="glass-panel focus-panel preview-panel">
-          <label className="field color-select-field">
-            <span className="mini-label">Garment color</span>
-            <div className="color-picker" ref={colorPickerRef}>
-              <button
-                type="button"
-                className="spotlight-control color-picker-trigger"
-                aria-haspopup="listbox"
-                aria-expanded={isColorMenuOpen}
-                onClick={() => setIsColorMenuOpen((current) => !current)}
-              >
-                <span
-                  className="color-chip"
-                  style={{ backgroundColor: selection.shirtColor.hex }}
-                />
-                <span className="color-picker-label">{selection.shirtColor.label}</span>
-                <span className={`color-picker-caret ${isColorMenuOpen ? 'open' : ''}`}>
-                  ▾
-                </span>
-              </button>
-              {isColorMenuOpen ? (
-                <div className="color-picker-menu" role="listbox" aria-label="Garment color">
-                  {SHIRT_COLORS.map((color) => (
-                    <button
-                      key={color.value}
-                      type="button"
-                      role="option"
-                      aria-selected={form.shirtColor === color.value}
-                      className={`color-picker-option ${
-                        form.shirtColor === color.value ? 'active' : ''
-                      }`}
-                      onClick={() => handleShirtColorChange(color.value)}
-                    >
-                      <span
-                        className="color-chip"
-                        style={{ backgroundColor: color.hex }}
-                      />
-                      <span>{color.label}</span>
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </label>
-
-          <div className="glass-band mockup-band">
-            <div className="mockup-gallery">
-              <figure className="mockup-stage">
-                <figcaption className="mockup-caption">Front</figcaption>
-                <div className="mockup-frame">
-                  <div className="mockup-canvas">
-                    <img
-                      src={selection.shirtColor.frontImage}
-                      alt={`${selection.shirtColor.label} shirt front`}
-                      className="shirt-mockup-image"
-                    />
-                    {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
-                      if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
-                        return null
-                      }
-
-                      const placement = graphicPlacements[field] ?? config
-
-                      return (
-                        <div
-                          key={field}
-                          className={`graphic-overlay ${dragState?.field === field ? 'dragging' : ''}`}
-                          title={`${field} graphic at ${config.widthLabel}`}
-                          style={{
-                            left: `${placement.x}%`,
-                            top: `${placement.y}%`,
-                            width: `${placement.width}%`,
-                            transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
-                          }}
-                          onPointerDown={handleGraphicPointerDown(field)}
-                        >
-                          <img
-                            src={graphics[field].url}
-                            alt={graphics[field].name}
-                            className="graphic-overlay-image"
-                            draggable="false"
-                          />
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              </figure>
-              <figure className="mockup-stage">
-                <figcaption className="mockup-caption">Back</figcaption>
-                <div className="mockup-frame">
-                  <div className="mockup-canvas">
-                    <img
-                      src={selection.shirtColor.backImage}
-                      alt={`${selection.shirtColor.label} shirt back`}
-                      className="shirt-mockup-image"
-                    />
-                    {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
-                      if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
-                        return null
-                      }
-
-                      const placement = graphicPlacements[field] ?? config
-
-                      return (
-                        <div
-                          key={field}
-                          className={`graphic-overlay ${dragState?.field === field ? 'dragging' : ''}`}
-                          title={`${field} graphic at ${config.widthLabel}`}
-                          style={{
-                            left: `${placement.x}%`,
-                            top: `${placement.y}%`,
-                            width: `${placement.width}%`,
-                            transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
-                          }}
-                          onPointerDown={handleGraphicPointerDown(field)}
-                        >
-                          <img
-                            src={graphics[field].url}
-                            alt={graphics[field].name}
-                            className="graphic-overlay-image"
-                            draggable="false"
-                          />
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              </figure>
-            </div>
-          </div>
-        </article>
       </section>
     </main>
   )

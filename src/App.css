@@ -379,6 +379,14 @@
   align-items: center;
 }
 
+.overview-band {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(126, 224, 200, 0.09), rgba(137, 168, 255, 0.08)),
+    rgba(255, 255, 255, 0.04);
+}
+
 .garment-preview > div {
   min-width: 0;
 }
@@ -563,6 +571,7 @@
 
   .toggle-grid,
   .mockup-gallery,
+  .overview-band,
   .garment-preview,
   .pricing-band {
     grid-template-columns: 1fr;
