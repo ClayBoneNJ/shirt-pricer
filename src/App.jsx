@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v12'
+const APP_VERSION = 'v13'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -784,18 +784,20 @@ function App() {
             <span className="mini-label">Layout graphics</span>
             <div className="layout-toggle-row">
               <label className="toggle-card compact-toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.leftBreast || form.printLocations.fullFront}
-                  onChange={(event) => {
-                    if (!event.target.checked) {
-                      handleFrontPlacementChange('fullFront', false)
-                      return
-                    }
-                    handleFrontPlacementChange('fullFront', true)
-                  }}
-                />
-                <span>Front Graphic</span>
+                <div className="compact-card-header">
+                  <input
+                    type="checkbox"
+                    checked={form.printLocations.leftBreast || form.printLocations.fullFront}
+                    onChange={(event) => {
+                      if (!event.target.checked) {
+                        handleFrontPlacementChange('fullFront', false)
+                        return
+                      }
+                      handleFrontPlacementChange('fullFront', true)
+                    }}
+                  />
+                  <span>Front Graphic</span>
+                </div>
                 <small>
                   {form.printLocations.leftBreast
                     ? formatMoney(selection.leftBreastCost)
@@ -840,12 +842,14 @@ function App() {
               </label>
 
               <label className="toggle-card compact-toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.leftSleeve}
-                  onChange={handlePrintToggle('leftSleeve')}
-                />
-                <span>Left Sleeve</span>
+                <div className="compact-card-header">
+                  <input
+                    type="checkbox"
+                    checked={form.printLocations.leftSleeve}
+                    onChange={handlePrintToggle('leftSleeve')}
+                  />
+                  <span>Left Sleeve</span>
+                </div>
                 <small>{formatMoney(selection.sleeveCost)} per sleeve</small>
                 <div
                   className="upload-row"
@@ -864,12 +868,14 @@ function App() {
               </label>
 
               <label className="toggle-card compact-toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.rightSleeve}
-                  onChange={handlePrintToggle('rightSleeve')}
-                />
-                <span>Right Sleeve</span>
+                <div className="compact-card-header">
+                  <input
+                    type="checkbox"
+                    checked={form.printLocations.rightSleeve}
+                    onChange={handlePrintToggle('rightSleeve')}
+                  />
+                  <span>Right Sleeve</span>
+                </div>
                 <small>{formatMoney(selection.sleeveCost)} per sleeve</small>
                 <div
                   className="upload-row"
@@ -888,12 +894,14 @@ function App() {
               </label>
 
               <label className="toggle-card compact-toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.fullBack}
-                  onChange={handlePrintToggle('fullBack')}
-                />
-                <span>Full Back</span>
+                <div className="compact-card-header">
+                  <input
+                    type="checkbox"
+                    checked={form.printLocations.fullBack}
+                    onChange={handlePrintToggle('fullBack')}
+                  />
+                  <span>Full Back</span>
+                </div>
                 <small>{formatMoney(selection.fullBackCost)} each</small>
                 <div
                   className="upload-row"
