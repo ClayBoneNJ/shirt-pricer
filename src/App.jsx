@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v6'
+const APP_VERSION = 'v7'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -184,8 +184,8 @@ const GRAPHIC_LAYOUTS = {
   },
 }
 
-const WHITE_BACKGROUND_THRESHOLD = 190
-const WHITE_BACKGROUND_SOFTNESS = 70
+const BACKGROUND_MATCH_THRESHOLD = 95
+const BACKGROUND_MATCH_SOFTNESS = 60
 
 const clampNumber = (value) => {
   const parsed = Number(value)
@@ -260,16 +260,59 @@ const loadImageFile = (file) =>
     image.src = objectUrl
   })
 
-const isNearWhitePixel = (data, index) => {
+const getColorDistance = (red, green, blue, target) =>
+  Math.sqrt(
+    (red - target.red) ** 2 +
+      (green - target.green) ** 2 +
+      (blue - target.blue) ** 2,
+  )
+
+const sampleBorderBackground = (data, width, height) => {
+  const samples = []
+
+  const pushSample = (x, y) => {
+    const index = (y * width + x) * 4
+    samples.push({
+      red: data[index],
+      green: data[index + 1],
+      blue: data[index + 2],
+    })
+  }
+
+  for (let x = 0; x < width; x += 1) {
+    pushSample(x, 0)
+    pushSample(x, height - 1)
+  }
+
+  for (let y = 1; y < height - 1; y += 1) {
+    pushSample(0, y)
+    pushSample(width - 1, y)
+  }
+
+  const totals = samples.reduce(
+    (accumulator, sample) => ({
+      red: accumulator.red + sample.red,
+      green: accumulator.green + sample.green,
+      blue: accumulator.blue + sample.blue,
+    }),
+    { red: 0, green: 0, blue: 0 },
+  )
+
+  return {
+    red: totals.red / samples.length,
+    green: totals.green / samples.length,
+    blue: totals.blue / samples.length,
+  }
+}
+
+const isBackgroundLikePixel = (data, index, backgroundColor) => {
   const red = data[index]
   const green = data[index + 1]
   const blue = data[index + 2]
-  const brightestChannel = Math.max(red, green, blue)
-  const darkestChannel = Math.min(red, green, blue)
 
   return (
-    brightestChannel >= WHITE_BACKGROUND_THRESHOLD &&
-    brightestChannel - darkestChannel <= WHITE_BACKGROUND_SOFTNESS
+    getColorDistance(red, green, blue, backgroundColor) <=
+    BACKGROUND_MATCH_THRESHOLD + BACKGROUND_MATCH_SOFTNESS
   )
 }
 
@@ -290,6 +333,7 @@ const removeWhiteBackgroundFromJpg = async (file) => {
   const { data } = imageData
   const width = canvas.width
   const height = canvas.height
+  const backgroundColor = sampleBorderBackground(data, width, height)
   const visited = new Uint8Array(width * height)
   const queue = []
 
@@ -306,7 +350,7 @@ const removeWhiteBackgroundFromJpg = async (file) => {
 
     const dataIndex = pixelIndex * 4
 
-    if (!isNearWhitePixel(data, dataIndex)) {
+    if (!isBackgroundLikePixel(data, dataIndex, backgroundColor)) {
       return
     }
 
@@ -332,10 +376,13 @@ const removeWhiteBackgroundFromJpg = async (file) => {
     const red = data[dataIndex]
     const green = data[dataIndex + 1]
     const blue = data[dataIndex + 2]
-    const brightestChannel = Math.max(red, green, blue)
+    const colorDistance = getColorDistance(red, green, blue, backgroundColor)
     const alphaRatio = Math.min(
       1,
-      Math.max(0, (255 - brightestChannel) / WHITE_BACKGROUND_SOFTNESS),
+      Math.max(
+        0,
+        (colorDistance - BACKGROUND_MATCH_THRESHOLD) / BACKGROUND_MATCH_SOFTNESS,
+      ),
     )
 
     data[dataIndex + 3] = Math.round(alphaRatio * 255)
