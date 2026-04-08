@@ -301,7 +301,7 @@
 
 .layout-toggle-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -513,6 +513,31 @@
 .compact-toggle-card .upload-button {
   min-height: 32px;
   font-size: 0.76rem;
+}
+
+.front-size-switch {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.size-chip {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(173, 204, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted-strong);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.size-chip.active {
+  border-color: rgba(126, 224, 200, 0.32);
+  background: rgba(126, 224, 200, 0.14);
+  color: var(--heading);
 }
 
 .upload-row {

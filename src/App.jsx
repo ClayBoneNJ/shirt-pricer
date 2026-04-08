@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v10'
+const APP_VERSION = 'v11'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -473,6 +473,8 @@ function App() {
     }
   }, [form])
 
+  const sharedFrontGraphic = graphics.leftBreast ?? graphics.fullFront
+
   const handleApparelChange = (event) => {
     const apparelType = event.target.value
 
@@ -512,6 +514,17 @@ function App() {
     }))
   }
 
+  const handleFrontPlacementChange = (field, checked) => {
+    setForm((current) => ({
+      ...current,
+      printLocations: {
+        ...current.printLocations,
+        leftBreast: checked && field === 'leftBreast',
+        fullFront: checked && field === 'fullFront',
+      },
+    }))
+  }
+
   const handleGraphicUpload = (field) => async (event) => {
     const file = event.target.files?.[0]
 
@@ -537,6 +550,39 @@ function App() {
         name: file.name,
         url: graphicUrl,
       },
+    }))
+
+    event.target.value = ''
+  }
+
+  const handleFrontGraphicUpload = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    const isJpgUpload = /image\/jpeg|image\/jpg/i.test(file.type) || /\.jpe?g$/i.test(file.name)
+
+    let graphicUrl
+
+    try {
+      graphicUrl = isJpgUpload
+        ? await removeWhiteBackgroundFromJpg(file)
+        : URL.createObjectURL(file)
+    } catch {
+      graphicUrl = URL.createObjectURL(file)
+    }
+
+    const sharedGraphic = {
+      name: file.name,
+      url: graphicUrl,
+    }
+
+    setGraphics((current) => ({
+      ...current,
+      leftBreast: sharedGraphic,
+      fullFront: sharedGraphic,
     }))
 
     event.target.value = ''
@@ -740,37 +786,43 @@ function App() {
               <label className="toggle-card compact-toggle-card">
                 <input
                   type="checkbox"
-                  checked={form.printLocations.leftBreast}
-                  onChange={handlePrintToggle('leftBreast')}
+                  checked={form.printLocations.leftBreast || form.printLocations.fullFront}
+                  onChange={(event) => {
+                    if (!event.target.checked) {
+                      handleFrontPlacementChange('fullFront', false)
+                      return
+                    }
+                    handleFrontPlacementChange('fullFront', true)
+                  }}
                 />
-                <span>Left Breast</span>
-                <small>{formatMoney(selection.leftBreastCost)} each</small>
-                <div
-                  className="upload-row"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <label className="upload-button">
-                    Upload graphic
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleGraphicUpload('leftBreast')}
-                    />
-                  </label>
-                  <small className="upload-meta">
-                    {graphics.leftBreast?.name ?? '4 in wide'}
-                  </small>
+                <span>Front Graphic</span>
+                <small>
+                  {form.printLocations.leftBreast
+                    ? `${formatMoney(selection.leftBreastCost)} at 4 in`
+                    : `${formatMoney(selection.fullFrontCost)} at 11 in`}
+                </small>
+                <div className="front-size-switch">
+                  <button
+                    type="button"
+                    className={`size-chip ${form.printLocations.leftBreast ? 'active' : ''}`}
+                    onClick={(event) => {
+                      event.preventDefault()
+                      handleFrontPlacementChange('leftBreast', true)
+                    }}
+                  >
+                    Left Breast
+                  </button>
+                  <button
+                    type="button"
+                    className={`size-chip ${form.printLocations.fullFront ? 'active' : ''}`}
+                    onClick={(event) => {
+                      event.preventDefault()
+                      handleFrontPlacementChange('fullFront', true)
+                    }}
+                  >
+                    Full Front
+                  </button>
                 </div>
-              </label>
-
-              <label className="toggle-card compact-toggle-card">
-                <input
-                  type="checkbox"
-                  checked={form.printLocations.fullFront}
-                  onChange={handlePrintToggle('fullFront')}
-                />
-                <span>Full Front</span>
-                <small>{formatMoney(selection.fullFrontCost)} each</small>
                 <div
                   className="upload-row"
                   onClick={(event) => event.stopPropagation()}
@@ -780,11 +832,12 @@ function App() {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleGraphicUpload('fullFront')}
+                      onChange={handleFrontGraphicUpload}
                     />
                   </label>
                   <small className="upload-meta">
-                    {graphics.fullFront?.name ?? '11 in wide'}
+                    {sharedFrontGraphic?.name ??
+                      (form.printLocations.leftBreast ? '4 in wide' : '11 in wide')}
                   </small>
                 </div>
               </label>
