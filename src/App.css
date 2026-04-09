@@ -557,9 +557,6 @@
     radial-gradient(circle at bottom right, rgba(var(--quote-base), 0.24), transparent 32%),
     linear-gradient(180deg, rgba(17, 23, 36, 0.84), rgba(24, 29, 45, 0.88));
   isolation: isolate;
-  transform: scaleY(0.88);
-  transform-origin: top center;
-  margin-bottom: -96px;
 }
 
 .quote-mock-background {
@@ -573,7 +570,8 @@
   object-fit: cover;
   object-position: center;
   filter: hue-rotate(var(--quote-hue)) saturate(1.35) brightness(0.72) contrast(1.08);
-  transform: scale(1.02);
+  transform: scaleX(1.02) scaleY(0.88);
+  transform-origin: center;
   opacity: 0.72;
   pointer-events: none;
 }
@@ -695,10 +693,10 @@
 }
 
 .quote-mock-card figcaption {
-  margin-top: 6px;
-  font-size: 0.84rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  margin-top: 10px;
+  font-size: clamp(1.4rem, 2vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(241, 245, 249, 0.9);
   text-align: center;
