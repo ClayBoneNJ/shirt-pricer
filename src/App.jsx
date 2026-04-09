@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v66'
+const APP_VERSION = 'v67'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1098,19 +1098,19 @@ function App() {
 
     context.globalAlpha = 0.14
     drawContainedImage(context, logoWatermarkImage, -120, exportHeight - 480, 760, 520, -8)
-    context.globalAlpha = 0.2
+    context.globalAlpha = 0.32
     if (frontWatermarkImage) {
-      drawContainedImage(context, frontWatermarkImage, exportWidth - 560, -60, 700, 420, 14)
+      drawContainedImage(context, frontWatermarkImage, exportWidth - 760, -120, 1040, 620, 14)
     }
-    context.globalAlpha = 0.12
+    context.globalAlpha = 0.24
     if (backWatermarkImage) {
       drawContainedImage(
         context,
         backWatermarkImage,
-        exportWidth - 440,
-        exportHeight - 420,
-        520,
-        360,
+        exportWidth - 560,
+        exportHeight - 370,
+        760,
+        460,
         14,
       )
     }
@@ -1194,25 +1194,50 @@ function App() {
     context.fill()
 
     const infoColumns = [
-      { label: 'TYPE', value: selection.garmentLabel, note: selection.garmentNote, x: 120 },
-      { label: 'PRICE PER GARMENT', value: formatMoney(selection.unitPrice), x: 620 },
-      { label: 'HOW MANY', value: String(selection.quantity), x: 970 },
-      { label: 'TOTAL PRICE', value: formatMoney(selection.customerPrice), x: 1330 },
+      { label: 'TYPE', value: selection.garmentLabel, note: selection.garmentNote, x: 120, width: 430 },
+      { label: 'PRICE PER GARMENT', value: formatMoney(selection.unitPrice), x: 610, width: 290 },
+      { label: 'HOW MANY', value: String(selection.quantity), x: 980, width: 210 },
+      { label: 'TOTAL PRICE', value: formatMoney(selection.customerPrice), x: 1290, width: 360 },
     ]
 
     infoColumns.forEach((item) => {
       context.textAlign = 'left'
       context.fillStyle = 'rgba(55, 65, 81, 0.72)'
       context.font = '700 18px Arial'
-      context.fillText(item.label, item.x, exportHeight - 154)
+      context.fillText(item.label, item.x, exportHeight - 150)
       context.fillStyle = '#111827'
       context.font = '700 44px Arial'
-      context.fillText(item.value, item.x, exportHeight - 112)
+      context.fillText(item.value, item.x, exportHeight - 102)
 
       if (item.note) {
         context.fillStyle = 'rgba(55, 65, 81, 0.8)'
         context.font = '400 18px Arial'
-        context.fillText(item.note, item.x, exportHeight - 72)
+        const noteLines = []
+        const words = item.note.split(' ')
+        let currentLine = ''
+
+        words.forEach((word) => {
+          const candidate = currentLine ? `${currentLine} ${word}` : word
+
+          if (context.measureText(candidate).width <= item.width) {
+            currentLine = candidate
+            return
+          }
+
+          if (currentLine) {
+            noteLines.push(currentLine)
+          }
+
+          currentLine = word
+        })
+
+        if (currentLine) {
+          noteLines.push(currentLine)
+        }
+
+        noteLines.slice(0, 2).forEach((line, index) => {
+          context.fillText(line, item.x, exportHeight - 64 + index * 22)
+        })
       }
     })
 
