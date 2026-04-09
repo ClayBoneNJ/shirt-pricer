@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v55'
+const APP_VERSION = 'v56'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -111,7 +111,6 @@ const createDefaultForm = () => ({
   apparelType: DEFAULT_APPAREL,
   shirtColor: 'black',
   quantity: '24',
-  quantityTier: '24-47',
   blankCost: PRICING_CONFIG.blankPrices[DEFAULT_APPAREL].cost.toFixed(2),
   transferPrices: {
     leftBreast: PRICING_CONFIG.transferPrices.leftBreast.cost.toFixed(2),
@@ -200,6 +199,30 @@ const clampNumber = (value) => {
 }
 
 const sanitizeIntegerInput = (value) => value.replace(/\D/g, '')
+
+const getQuantityTierForQuantity = (quantity) => {
+  if (quantity >= 72) {
+    return PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === '72+')
+  }
+
+  if (quantity >= 48) {
+    return PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === '48-71')
+  }
+
+  if (quantity >= 24) {
+    return PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === '24-47')
+  }
+
+  if (quantity >= 12) {
+    return PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === '12-23')
+  }
+
+  if (quantity >= 6) {
+    return PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === '6-11')
+  }
+
+  return PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === '1-5')
+}
 
 const hexToRgb = (hex) => {
   const normalized = hex.replace('#', '')
@@ -563,9 +586,7 @@ function App() {
     const fullFrontCost = clampNumber(form.transferPrices.fullFront)
     const fullBackCost = clampNumber(form.transferPrices.fullBack)
     const sleeveCost = clampNumber(form.transferPrices.sleeve)
-    const quantityTier =
-      PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === form.quantityTier) ??
-      PRICING_CONFIG.quantityBreaks[0]
+    const quantityTier = getQuantityTierForQuantity(quantity) ?? PRICING_CONFIG.quantityBreaks[0]
     const shirtColor =
       SHIRT_COLORS.find((color) => color.value === form.shirtColor) ?? SHIRT_COLORS[0]
     const garmentImagePrefix = getGarmentImagePrefix(form.apparelType)
@@ -676,11 +697,6 @@ function App() {
       apparelType,
       blankCost: PRICING_CONFIG.blankPrices[apparelType].cost.toFixed(2),
     }))
-  }
-
-  const handleQuantityTierChange = (event) => {
-    const quantityTier = event.target.value
-    setForm((current) => ({ ...current, quantityTier }))
   }
 
   const handleQuantityChange = (event) => {
@@ -1028,21 +1044,6 @@ function App() {
                 {Object.entries(PRICING_CONFIG.blankPrices).map(([value, item]) => (
                   <option key={value} value={value}>
                     {item.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field preview-control-field">
-              <span>Quantity tier</span>
-              <select
-                className="spotlight-control tier-select"
-                value={form.quantityTier}
-                onChange={handleQuantityTierChange}
-              >
-                {PRICING_CONFIG.quantityBreaks.map((tier) => (
-                  <option key={tier.value} value={tier.value}>
-                    {tier.label}
                   </option>
                 ))}
               </select>
