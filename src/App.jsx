@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v65'
+const APP_VERSION = 'v66'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -471,15 +471,81 @@ const drawRoundedRect = (context, x, y, width, height, radius) => {
   context.closePath()
 }
 
-const drawContainedImage = (context, image, x, y, width, height, rotation = 0) => {
-  const scale = Math.min(width / image.width, height / image.height)
-  const drawWidth = image.width * scale
-  const drawHeight = image.height * scale
+const getOpaqueImageBounds = (image, alphaThreshold = 8) => {
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+
+  if (!context) {
+    return { x: 0, y: 0, width: image.width, height: image.height }
+  }
+
+  canvas.width = image.width
+  canvas.height = image.height
+  context.drawImage(image, 0, 0)
+
+  const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height)
+  let minX = width
+  let minY = height
+  let maxX = -1
+  let maxY = -1
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const alpha = data[(y * width + x) * 4 + 3]
+
+      if (alpha > alphaThreshold) {
+        minX = Math.min(minX, x)
+        minY = Math.min(minY, y)
+        maxX = Math.max(maxX, x)
+        maxY = Math.max(maxY, y)
+      }
+    }
+  }
+
+  if (maxX < minX || maxY < minY) {
+    return { x: 0, y: 0, width: image.width, height: image.height }
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
+  }
+}
+
+const drawContainedImage = (
+  context,
+  image,
+  x,
+  y,
+  width,
+  height,
+  rotation = 0,
+  sourceBounds = null,
+) => {
+  const sourceWidth = sourceBounds?.width ?? image.width
+  const sourceHeight = sourceBounds?.height ?? image.height
+  const sourceX = sourceBounds?.x ?? 0
+  const sourceY = sourceBounds?.y ?? 0
+  const scale = Math.min(width / sourceWidth, height / sourceHeight)
+  const drawWidth = sourceWidth * scale
+  const drawHeight = sourceHeight * scale
 
   context.save()
   context.translate(x + width / 2, y + height / 2)
   context.rotate((rotation * Math.PI) / 180)
-  context.drawImage(image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight)
+  context.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    -drawWidth / 2,
+    -drawHeight / 2,
+    drawWidth,
+    drawHeight,
+  )
   context.restore()
 }
 
@@ -1017,6 +1083,9 @@ function App() {
       mockBackGraphic ? loadImageFromSrc(mockBackGraphic.url) : Promise.resolve(null),
     ])
 
+    const shirtFrontBounds = getOpaqueImageBounds(shirtFrontImage)
+    const shirtBackBounds = getOpaqueImageBounds(shirtBackImage)
+
     context.fillStyle = '#111827'
     context.fillRect(0, 0, exportWidth, exportHeight)
 
@@ -1077,6 +1146,7 @@ function App() {
       frontStage.width,
       frontStage.height,
       frontStage.rotation,
+      shirtFrontBounds,
     )
     drawContainedImage(
       context,
@@ -1086,6 +1156,7 @@ function App() {
       backStage.width,
       backStage.height,
       backStage.rotation,
+      shirtBackBounds,
     )
 
     const drawPlacedGraphic = (image, view, field) => {
