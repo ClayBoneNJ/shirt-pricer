@@ -626,7 +626,9 @@
 .quote-mock-garments {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 0;
+  align-items: end;
+  justify-items: center;
 }
 
 .quote-mock-card {
@@ -640,6 +642,16 @@
   backdrop-filter: none;
 }
 
+.quote-mock-card:first-child {
+  transform: rotate(-4deg) translateX(18px);
+  transform-origin: center bottom;
+}
+
+.quote-mock-card:last-child {
+  transform: rotate(4deg) translateX(-18px);
+  transform-origin: center bottom;
+}
+
 .quote-mock-card figcaption {
   font-size: 0.82rem;
   font-weight: 700;
@@ -651,7 +663,7 @@
 
 .quote-mock-canvas {
   position: relative;
-  width: min(100%, 420px);
+  width: min(100%, 470px);
   margin: 0 auto;
   aspect-ratio: 2 / 3;
 }
@@ -1236,10 +1248,11 @@
     gap: 8px;
     padding: 0;
     border-radius: 0;
+    transform: none;
   }
 
   .quote-mock-canvas {
-    width: min(100%, 260px);
+    width: min(100%, 300px);
   }
 
   .quote-mock-pricing > div,
