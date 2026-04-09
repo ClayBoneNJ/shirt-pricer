@@ -541,6 +541,9 @@
     radial-gradient(circle at bottom right, rgba(var(--quote-base), 0.24), transparent 32%),
     linear-gradient(180deg, rgba(17, 23, 36, 0.84), rgba(24, 29, 45, 0.88));
   isolation: isolate;
+  transform: scaleY(0.88);
+  transform-origin: top center;
+  margin-bottom: -96px;
 }
 
 .quote-mock-background {
