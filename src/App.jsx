@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v18'
+const APP_VERSION = 'v19'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -198,6 +198,113 @@ const clampNumber = (value) => {
 }
 
 const sanitizeIntegerInput = (value) => value.replace(/\D/g, '')
+
+const hexToRgb = (hex) => {
+  const normalized = hex.replace('#', '')
+  const expanded =
+    normalized.length === 3
+      ? normalized
+          .split('')
+          .map((character) => `${character}${character}`)
+          .join('')
+      : normalized
+
+  const parsed = Number.parseInt(expanded, 16)
+
+  if (!Number.isFinite(parsed)) {
+    return { red: 94, green: 139, blue: 233 }
+  }
+
+  return {
+    red: (parsed >> 16) & 255,
+    green: (parsed >> 8) & 255,
+    blue: parsed & 255,
+  }
+}
+
+const getGraphicAccentColor = (imageUrl) =>
+  new Promise((resolve) => {
+    const image = new Image()
+    image.crossOrigin = 'anonymous'
+
+    image.onload = () => {
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d', { willReadFrequently: true })
+
+      if (!context) {
+        resolve({ red: 94, green: 139, blue: 233 })
+        return
+      }
+
+      const sampleWidth = 36
+      const sampleHeight = Math.max(
+        1,
+        Math.round((image.naturalHeight / image.naturalWidth) * sampleWidth),
+      )
+
+      canvas.width = sampleWidth
+      canvas.height = sampleHeight
+      context.drawImage(image, 0, 0, sampleWidth, sampleHeight)
+
+      const { data } = context.getImageData(0, 0, sampleWidth, sampleHeight)
+      const buckets = new Map()
+
+      for (let index = 0; index < data.length; index += 4) {
+        const alpha = data[index + 3]
+
+        if (alpha < 80) {
+          continue
+        }
+
+        const red = data[index]
+        const green = data[index + 1]
+        const blue = data[index + 2]
+        const max = Math.max(red, green, blue)
+        const min = Math.min(red, green, blue)
+        const saturation = max - min
+        const brightness = (red + green + blue) / 3
+
+        if (saturation < 32 || brightness < 28 || brightness > 235) {
+          continue
+        }
+
+        const bucketRed = Math.round(red / 24) * 24
+        const bucketGreen = Math.round(green / 24) * 24
+        const bucketBlue = Math.round(blue / 24) * 24
+        const key = `${bucketRed}-${bucketGreen}-${bucketBlue}`
+        const score = saturation + alpha / 12
+        const current = buckets.get(key) ?? {
+          red: 0,
+          green: 0,
+          blue: 0,
+          weight: 0,
+        }
+
+        buckets.set(key, {
+          red: current.red + red * score,
+          green: current.green + green * score,
+          blue: current.blue + blue * score,
+          weight: current.weight + score,
+        })
+      }
+
+      const bestBucket = [...buckets.values()].sort((left, right) => right.weight - left.weight)[0]
+
+      if (!bestBucket) {
+        resolve({ red: 94, green: 139, blue: 233 })
+        return
+      }
+
+      resolve({
+        red: Math.round(bestBucket.red / bestBucket.weight),
+        green: Math.round(bestBucket.green / bestBucket.weight),
+        blue: Math.round(bestBucket.blue / bestBucket.weight),
+      })
+    }
+
+    image.onerror = () => resolve({ red: 94, green: 139, blue: 233 })
+    image.src = imageUrl
+  })
 
 const formatMoney = (value) =>
   new Intl.NumberFormat('en-US', {
@@ -409,6 +516,7 @@ function App() {
   const [dragState, setDragState] = useState(null)
   const [isColorMenuOpen, setIsColorMenuOpen] = useState(false)
   const [isQuoteMockVisible, setIsQuoteMockVisible] = useState(false)
+  const [quoteAccentColor, setQuoteAccentColor] = useState(hexToRgb(SHIRT_COLORS[1].hex))
   const colorPickerRef = useRef(null)
 
   const selection = useMemo(() => {
@@ -486,6 +594,34 @@ function App() {
     (form.printLocations.leftBreast && graphics.leftBreast) ||
     null
   const mockBackGraphic = form.printLocations.fullBack ? graphics.fullBack : null
+  const quoteAccentCss = `${quoteAccentColor.red}, ${quoteAccentColor.green}, ${quoteAccentColor.blue}`
+  const shirtColorRgb = hexToRgb(selection.shirtColor.hex)
+  const quoteBaseCss = `${shirtColorRgb.red}, ${shirtColorRgb.green}, ${shirtColorRgb.blue}`
+
+  useEffect(() => {
+    let isActive = true
+
+    const updateAccentColor = async () => {
+      const primaryGraphic = mockFrontGraphic?.url ?? mockBackGraphic?.url
+
+      if (!primaryGraphic) {
+        setQuoteAccentColor(hexToRgb(selection.shirtColor.hex))
+        return
+      }
+
+      const nextColor = await getGraphicAccentColor(primaryGraphic)
+
+      if (isActive) {
+        setQuoteAccentColor(nextColor)
+      }
+    }
+
+    updateAccentColor()
+
+    return () => {
+      isActive = false
+    }
+  }, [mockFrontGraphic, mockBackGraphic, selection.shirtColor.hex])
 
   const handleApparelChange = (event) => {
     const apparelType = event.target.value
@@ -1068,7 +1204,14 @@ function App() {
 
         {isQuoteMockVisible ? (
           <section className="glass-panel focus-panel quote-mock-panel">
-            <div className="quote-mock-sheet">
+            <div
+              className="quote-mock-sheet"
+              style={{
+                '--quote-accent': quoteAccentCss,
+                '--quote-base': quoteBaseCss,
+                '--quote-background-image': `url(${ASSET_BASE_URL}backgrond-blue.png)`,
+              }}
+            >
               <div className="quote-mock-watermarks" aria-hidden="true">
                 {mockFrontGraphic ? (
                   <img
