@@ -1204,17 +1204,21 @@ function App() {
     ]
 
     infoColumns.forEach((item) => {
+      const hasNote = Boolean(item.note)
+      const valueY = hasNote ? infoPillY + 78 : infoPillY + 86
+      const noteY = hasNote ? infoPillY + 104 : infoPillY + 118
+
       context.textAlign = 'left'
       context.fillStyle = 'rgba(55, 65, 81, 0.72)'
       context.font = '700 18px Arial'
       context.fillText(item.label, item.x, infoPillY + 34)
       context.fillStyle = '#111827'
       context.font = '700 44px Arial'
-      context.fillText(item.value, item.x, infoPillY + 86)
+      context.fillText(item.value, item.x, valueY)
 
-      if (item.note) {
+      if (hasNote) {
         context.fillStyle = 'rgba(55, 65, 81, 0.8)'
-        context.font = '400 18px Arial'
+        context.font = '400 17px Arial'
         const noteLines = []
         const words = item.note.split(' ')
         let currentLine = ''
@@ -1239,7 +1243,7 @@ function App() {
         }
 
         noteLines.slice(0, 2).forEach((line, index) => {
-          context.fillText(line, item.x, infoPillY + 118 + index * 22)
+          context.fillText(line, item.x, noteY + index * 20)
         })
       }
     })
