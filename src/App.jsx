@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v61'
+const APP_VERSION = 'v62'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -424,6 +424,16 @@ const loadImageFile = (file) =>
     image.src = objectUrl
   })
 
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject(new Error('Unable to read uploaded image.'))
+
+    reader.readAsDataURL(file)
+  })
+
 const getColorDistance = (red, green, blue, target) =>
   Math.sqrt(
     (red - target.red) ** 2 +
@@ -486,7 +496,7 @@ const removeWhiteBackgroundFromJpg = async (file) => {
   const context = canvas.getContext('2d', { willReadFrequently: true })
 
   if (!context) {
-    return URL.createObjectURL(file)
+    return readFileAsDataUrl(file)
   }
 
   canvas.width = image.naturalWidth
@@ -752,9 +762,9 @@ function App() {
     try {
       graphicUrl = isJpgUpload
         ? await removeWhiteBackgroundFromJpg(file)
-        : URL.createObjectURL(file)
+        : await readFileAsDataUrl(file)
     } catch {
-      graphicUrl = URL.createObjectURL(file)
+      graphicUrl = await readFileAsDataUrl(file)
     }
 
     setGraphics((current) => ({
@@ -782,9 +792,9 @@ function App() {
     try {
       graphicUrl = isJpgUpload
         ? await removeWhiteBackgroundFromJpg(file)
-        : URL.createObjectURL(file)
+        : await readFileAsDataUrl(file)
     } catch {
-      graphicUrl = URL.createObjectURL(file)
+      graphicUrl = await readFileAsDataUrl(file)
     }
 
     const sharedGraphic = {
