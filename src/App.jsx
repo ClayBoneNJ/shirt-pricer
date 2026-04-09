@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v69'
+const APP_VERSION = 'v70'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1194,9 +1194,9 @@ function App() {
     context.fill()
 
     const infoColumns = [
-      { label: 'TYPE', value: selection.garmentLabel, note: selection.garmentNote, x: 120, width: 430 },
+      { label: 'GARMENT', value: selection.garmentLabel, note: selection.garmentNote, x: 120, width: 430 },
       { label: 'PRICE PER GARMENT', value: formatMoney(selection.unitPrice), x: 610, width: 290 },
-      { label: 'HOW MANY', value: String(selection.quantity), x: 980, width: 210 },
+      { label: 'QUANTITY', value: String(selection.quantity), x: 980, width: 210 },
       { label: 'TOTAL PRICE', value: formatMoney(selection.customerPrice), x: 1290, width: 360 },
     ]
 
@@ -1853,7 +1853,7 @@ function App() {
 
               <div className="quote-mock-info-bar">
                 <div className="quote-mock-info-item quote-mock-footer-type">
-                  <span className="mini-label">Type</span>
+                  <span className="mini-label">Garment</span>
                   <strong>{selection.garmentLabel}</strong>
                   <p>{selection.garmentNote}</p>
                 </div>
@@ -1862,7 +1862,7 @@ function App() {
                   <strong>{formatMoney(selection.unitPrice)}</strong>
                 </div>
                 <div className="quote-mock-info-item">
-                  <span className="mini-label">How many</span>
+                  <span className="mini-label">Quantity</span>
                   <strong>{selection.quantity}</strong>
                 </div>
                 <div className="quote-mock-info-item">
