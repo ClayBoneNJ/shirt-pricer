@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v70'
+const APP_VERSION = 'v71'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1189,7 +1189,10 @@ function App() {
     context.fillText('Front', 520, 1088)
     context.fillText('Back', 1280, 1088)
 
-    drawRoundedRect(context, 70, exportHeight - 190, exportWidth - 140, 120, 28)
+    const infoPillY = exportHeight - 228
+    const infoPillHeight = 156
+
+    drawRoundedRect(context, 70, infoPillY, exportWidth - 140, infoPillHeight, 28)
     context.fillStyle = 'rgba(255, 255, 255, 0.96)'
     context.fill()
 
@@ -1204,10 +1207,10 @@ function App() {
       context.textAlign = 'left'
       context.fillStyle = 'rgba(55, 65, 81, 0.72)'
       context.font = '700 18px Arial'
-      context.fillText(item.label, item.x, exportHeight - 150)
+      context.fillText(item.label, item.x, infoPillY + 34)
       context.fillStyle = '#111827'
       context.font = '700 44px Arial'
-      context.fillText(item.value, item.x, exportHeight - 102)
+      context.fillText(item.value, item.x, infoPillY + 86)
 
       if (item.note) {
         context.fillStyle = 'rgba(55, 65, 81, 0.8)'
@@ -1236,7 +1239,7 @@ function App() {
         }
 
         noteLines.slice(0, 2).forEach((line, index) => {
-          context.fillText(line, item.x, exportHeight - 64 + index * 22)
+          context.fillText(line, item.x, infoPillY + 118 + index * 22)
         })
       }
     })
