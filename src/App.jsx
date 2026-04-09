@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { toJpeg } from 'html-to-image'
 import './App.css'
 
 const PRICING_CONFIG = {
@@ -28,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v44'
+const APP_VERSION = 'v45'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -550,6 +551,8 @@ function App() {
   const [isColorMenuOpen, setIsColorMenuOpen] = useState(false)
   const [isQuoteMockVisible, setIsQuoteMockVisible] = useState(false)
   const [quoteAccentColor, setQuoteAccentColor] = useState(hexToRgb(SHIRT_COLORS[1].hex))
+  const [isQuoteMockExporting, setIsQuoteMockExporting] = useState(false)
+  const quoteMockRef = useRef(null)
   const colorPickerRef = useRef(null)
 
   const selection = useMemo(() => {
@@ -634,6 +637,10 @@ function App() {
   const shirtMockupClassName = `shirt-mockup-image${
     form.shirtColor === 'white' ? ' shirt-mockup-image-white' : ''
   }`
+  const quoteMockFileName = `${selection.garmentLabel
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')}-${selection.shirtColor.value}-${selection.quantity}-piece-quote.jpg`
 
   useEffect(() => {
     let isActive = true
@@ -861,6 +868,84 @@ function App() {
       window.removeEventListener('keydown', handleEscape)
     }
   }, [isColorMenuOpen])
+
+  const buildQuoteMockJpg = async () => {
+    if (!quoteMockRef.current) {
+      return null
+    }
+
+    return toJpeg(quoteMockRef.current, {
+      cacheBust: true,
+      quality: 0.96,
+      pixelRatio: 2,
+      backgroundColor: '#111827',
+    })
+  }
+
+  const downloadQuoteMockJpg = (dataUrl) => {
+    const link = document.createElement('a')
+    link.href = dataUrl
+    link.download = quoteMockFileName
+    document.body.append(link)
+    link.click()
+    link.remove()
+  }
+
+  const handleQuoteMockDownload = async () => {
+    setIsQuoteMockExporting(true)
+
+    try {
+      const dataUrl = await buildQuoteMockJpg()
+
+      if (dataUrl) {
+        downloadQuoteMockJpg(dataUrl)
+      }
+    } finally {
+      setIsQuoteMockExporting(false)
+    }
+  }
+
+  const handleQuoteMockShare = async () => {
+    setIsQuoteMockExporting(true)
+
+    try {
+      const dataUrl = await buildQuoteMockJpg()
+
+      if (!dataUrl) {
+        return
+      }
+
+      if (!navigator.share) {
+        downloadQuoteMockJpg(dataUrl)
+        return
+      }
+
+      const response = await fetch(dataUrl)
+      const blob = await response.blob()
+      const file = new File([blob], quoteMockFileName, { type: 'image/jpeg' })
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: `${selection.garmentLabel} quote`,
+          text: `${selection.garmentLabel} quote mock`,
+          files: [file],
+        })
+        return
+      }
+
+      downloadQuoteMockJpg(dataUrl)
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        const fallbackDataUrl = await buildQuoteMockJpg()
+
+        if (fallbackDataUrl) {
+          downloadQuoteMockJpg(fallbackDataUrl)
+        }
+      }
+    } finally {
+      setIsQuoteMockExporting(false)
+    }
+  }
 
   return (
     <main className="app-shell">
@@ -1199,13 +1284,35 @@ function App() {
             <div>
               <span className="mini-label">Pricing snapshot</span>
             </div>
-            <button
-              type="button"
-              className="quote-mock-button"
-              onClick={() => setIsQuoteMockVisible((current) => !current)}
-            >
-              {isQuoteMockVisible ? 'Hide mock with pricing' : 'Generate mock with pricing'}
-            </button>
+            <div className="quote-mock-actions">
+              {isQuoteMockVisible ? (
+                <>
+                  <button
+                    type="button"
+                    className="quote-mock-button"
+                    onClick={handleQuoteMockDownload}
+                    disabled={isQuoteMockExporting}
+                  >
+                    {isQuoteMockExporting ? 'Building JPG...' : 'Download JPG'}
+                  </button>
+                  <button
+                    type="button"
+                    className="quote-mock-button"
+                    onClick={handleQuoteMockShare}
+                    disabled={isQuoteMockExporting}
+                  >
+                    {isQuoteMockExporting ? 'Building JPG...' : 'Share JPG'}
+                  </button>
+                </>
+              ) : null}
+              <button
+                type="button"
+                className="quote-mock-button"
+                onClick={() => setIsQuoteMockVisible((current) => !current)}
+              >
+                {isQuoteMockVisible ? 'Hide mock with pricing' : 'Generate mock with pricing'}
+              </button>
+            </div>
           </div>
           <div className="pricing-summary-grid">
             <div>
@@ -1242,6 +1349,7 @@ function App() {
         {isQuoteMockVisible ? (
           <section className="glass-panel focus-panel quote-mock-panel">
             <div
+              ref={quoteMockRef}
               className="quote-mock-sheet"
               style={{
                 '--quote-accent': quoteAccentCss,

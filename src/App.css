@@ -510,6 +510,20 @@
   box-shadow: 0 16px 28px rgba(0, 0, 0, 0.2);
 }
 
+.quote-mock-button:disabled {
+  opacity: 0.66;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
+.quote-mock-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .quote-mock-panel {
   gap: 0;
   overflow: hidden;
@@ -1204,6 +1218,15 @@
     gap: 14px;
     padding: 14px;
     border-radius: 20px;
+  }
+
+  .quote-mock-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .quote-mock-actions .quote-mock-button {
+    flex: 1 1 180px;
   }
 
   .quote-mock-header {
