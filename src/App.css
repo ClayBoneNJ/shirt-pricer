@@ -678,9 +678,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
   gap: 18px;
-  padding: 16px 18px;
+  padding: 20px 22px;
   border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 999px;
+  border-radius: 28px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
 }
@@ -691,13 +691,15 @@
 
 .quote-mock-info-bar .mini-label {
   color: rgba(17, 24, 39, 0.66);
+  font-size: 0.9rem;
 }
 
 .quote-mock-info-bar strong {
   display: block;
-  margin-top: 5px;
+  margin-top: 7px;
   color: #111827;
-  font-size: 1.15rem;
+  font-size: 1.65rem;
+  line-height: 1.1;
 }
 
 .quote-mock-footer-type {
@@ -708,7 +710,7 @@
 .quote-mock-footer-type p {
   margin: 0;
   color: rgba(17, 24, 39, 0.8);
-  font-size: 0.88rem;
+  font-size: 1rem;
   line-height: 1.45;
 }
 
@@ -1258,12 +1260,12 @@
   }
 
   .quote-mock-info-bar {
-    padding: 12px 14px;
-    border-radius: 24px;
+    padding: 14px 16px;
+    border-radius: 22px;
   }
 
   .quote-mock-info-bar strong {
-    font-size: 1.2rem;
+    font-size: 1.35rem;
   }
 
   .overview-card,
