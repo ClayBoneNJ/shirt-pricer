@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { toBlob } from 'html-to-image'
 import './App.css'
 
 const PRICING_CONFIG = {
@@ -29,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v63'
+const APP_VERSION = 'v64'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -424,6 +423,16 @@ const loadImageFile = (file) =>
     image.src = objectUrl
   })
 
+const loadImageFromSrc = (src) =>
+  new Promise((resolve, reject) => {
+    const image = new Image()
+
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error(`Unable to load image: ${src}`))
+
+    image.src = src
+  })
+
 const readFileAsDataUrl = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -433,6 +442,56 @@ const readFileAsDataUrl = (file) =>
 
     reader.readAsDataURL(file)
   })
+
+const canvasToBlob = (canvas, type, quality) =>
+  new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob)
+        return
+      }
+
+      reject(new Error('Unable to create image blob.'))
+    }, type, quality)
+  })
+
+const drawRoundedRect = (context, x, y, width, height, radius) => {
+  const safeRadius = Math.min(radius, width / 2, height / 2)
+
+  context.beginPath()
+  context.moveTo(x + safeRadius, y)
+  context.lineTo(x + width - safeRadius, y)
+  context.quadraticCurveTo(x + width, y, x + width, y + safeRadius)
+  context.lineTo(x + width, y + height - safeRadius)
+  context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height)
+  context.lineTo(x + safeRadius, y + height)
+  context.quadraticCurveTo(x, y + height, x, y + height - safeRadius)
+  context.lineTo(x, y + safeRadius)
+  context.quadraticCurveTo(x, y, x + safeRadius, y)
+  context.closePath()
+}
+
+const drawContainedImage = (context, image, x, y, width, height, rotation = 0) => {
+  const scale = Math.min(width / image.width, height / image.height)
+  const drawWidth = image.width * scale
+  const drawHeight = image.height * scale
+
+  context.save()
+  context.translate(x + width / 2, y + height / 2)
+  context.rotate((rotation * Math.PI) / 180)
+  context.drawImage(image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight)
+  context.restore()
+}
+
+const drawOverlayImage = (context, image, x, y, width, rotation = 0) => {
+  const drawHeight = (image.height / image.width) * width
+
+  context.save()
+  context.translate(x, y)
+  context.rotate((rotation * Math.PI) / 180)
+  context.drawImage(image, -width / 2, -drawHeight / 2, width, drawHeight)
+  context.restore()
+}
 
 const getColorDistance = (red, green, blue, target) =>
   Math.sqrt(
@@ -919,16 +978,159 @@ function App() {
   }, [isColorMenuOpen])
 
   const buildQuoteMockJpgBlob = async () => {
-    if (!quoteMockRef.current) {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    if (!context) {
       return null
     }
 
-    return toBlob(quoteMockRef.current, {
-      cacheBust: true,
-      quality: 0.96,
-      pixelRatio: 2,
-      backgroundColor: '#111827',
+    const exportWidth = 1800
+    const exportHeight = 1320
+    canvas.width = exportWidth
+    canvas.height = exportHeight
+
+    const graphicImages = Object.fromEntries(
+      await Promise.all(
+        Object.entries(graphics).map(async ([field, graphic]) => [
+          field,
+          graphic?.url ? await loadImageFromSrc(graphic.url) : null,
+        ]),
+      ),
+    )
+
+    const [
+      backgroundImage,
+      companyLogoImage,
+      shirtFrontImage,
+      shirtBackImage,
+      logoWatermarkImage,
+      frontWatermarkImage,
+      backWatermarkImage,
+    ] = await Promise.all([
+      loadImageFromSrc(`${ASSET_BASE_URL}blue-background.png`),
+      loadImageFromSrc(`${ASSET_BASE_URL}company-logo.png`),
+      loadImageFromSrc(selection.shirtColor.frontImage),
+      loadImageFromSrc(selection.shirtColor.backImage),
+      loadImageFromSrc(`${ASSET_BASE_URL}company-logo.png`),
+      mockFrontGraphic ? loadImageFromSrc(mockFrontGraphic.url) : Promise.resolve(null),
+      mockBackGraphic ? loadImageFromSrc(mockBackGraphic.url) : Promise.resolve(null),
+    ])
+
+    context.fillStyle = '#111827'
+    context.fillRect(0, 0, exportWidth, exportHeight)
+
+    drawRoundedRect(context, 0, 0, exportWidth, exportHeight, 44)
+    context.save()
+    context.clip()
+    context.drawImage(backgroundImage, 0, 0, exportWidth, exportHeight)
+    context.fillStyle = 'rgba(8, 14, 22, 0.54)'
+    context.fillRect(0, 0, exportWidth, exportHeight)
+
+    context.globalAlpha = 0.14
+    drawContainedImage(context, logoWatermarkImage, -120, exportHeight - 480, 760, 520, -8)
+    context.globalAlpha = 0.2
+    if (frontWatermarkImage) {
+      drawContainedImage(context, frontWatermarkImage, exportWidth - 560, -60, 700, 420, 14)
+    }
+    context.globalAlpha = 0.12
+    if (backWatermarkImage) {
+      drawContainedImage(
+        context,
+        backWatermarkImage,
+        exportWidth - 440,
+        exportHeight - 420,
+        520,
+        360,
+        14,
+      )
+    }
+    context.globalAlpha = 1
+
+    context.drawImage(companyLogoImage, 70, 70, 240, 240)
+
+    context.fillStyle = '#f8fafc'
+    context.font = '700 64px Arial'
+    context.textBaseline = 'top'
+    context.fillText(quoteHeaderName, 328, 90)
+
+    context.fillStyle = 'rgba(226, 232, 240, 0.88)'
+    context.font = '500 30px Arial'
+    context.fillText(selection.garmentLabel, 328, 172)
+    context.fillText(`${selection.quantity} pieces`, 328, 214)
+    context.fillText(quotePlacementSummary, 328, 256)
+
+    context.fillStyle = 'rgba(226, 232, 240, 0.82)'
+    context.font = '700 24px Arial'
+    context.textAlign = 'center'
+    context.fillText('FRONT MOCK', 520, 350)
+    context.fillText('BACK MOCK', 1280, 350)
+
+    drawContainedImage(context, shirtFrontImage, 170, 360, 700, 660, -5)
+    drawContainedImage(context, shirtBackImage, 930, 360, 700, 660, 5)
+
+    const drawPlacedGraphic = (image, view, field) => {
+      if (!image) {
+        return
+      }
+
+      const placement = graphicPlacements[field] ?? GRAPHIC_LAYOUTS[field]
+      const stage = view === 'front'
+        ? { x: 170, y: 360, width: 700, height: 660, rotation: -5 }
+        : { x: 930, y: 360, width: 700, height: 660, rotation: 5 }
+      const width = stage.width * (placement.width / 100)
+      const x = stage.x + stage.width * (placement.x / 100)
+      const y = stage.y + stage.height * (placement.y / 100)
+
+      drawOverlayImage(context, image, x, y, width, placement.rotation + stage.rotation)
+    }
+
+    Object.entries(GRAPHIC_LAYOUTS).forEach(([field, config]) => {
+      if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
+        return
+      }
+
+      drawPlacedGraphic(graphicImages[field], 'front', field)
     })
+
+    Object.entries(GRAPHIC_LAYOUTS).forEach(([field, config]) => {
+      if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
+        return
+      }
+
+      drawPlacedGraphic(graphicImages[field], 'back', field)
+    })
+
+    drawRoundedRect(context, 70, exportHeight - 190, exportWidth - 140, 120, 28)
+    context.fillStyle = 'rgba(255, 255, 255, 0.96)'
+    context.fill()
+
+    const infoColumns = [
+      { label: 'TYPE', value: selection.garmentLabel, note: selection.garmentNote, x: 120 },
+      { label: 'PRICE PER GARMENT', value: formatMoney(selection.unitPrice), x: 620 },
+      { label: 'HOW MANY', value: String(selection.quantity), x: 970 },
+      { label: 'TOTAL PRICE', value: formatMoney(selection.customerPrice), x: 1330 },
+    ]
+
+    infoColumns.forEach((item) => {
+      context.textAlign = 'left'
+      context.fillStyle = 'rgba(55, 65, 81, 0.72)'
+      context.font = '700 18px Arial'
+      context.fillText(item.label, item.x, exportHeight - 154)
+      context.fillStyle = '#111827'
+      context.font = '700 44px Arial'
+      context.fillText(item.value, item.x, exportHeight - 112)
+
+      if (item.note) {
+        context.fillStyle = 'rgba(55, 65, 81, 0.8)'
+        context.font = '400 18px Arial'
+        context.fillText(item.note, item.x, exportHeight - 72)
+      }
+    })
+
+    context.restore()
+
+    return canvasToBlob(canvas, 'image/jpeg', 0.95)
   }
 
   const downloadQuoteMockJpg = (blob) => {
