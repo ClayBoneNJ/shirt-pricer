@@ -552,6 +552,15 @@
   transform: rotate(14deg);
 }
 
+.quote-mock-watermark-logo {
+  top: 50%;
+  left: 50%;
+  width: min(44vw, 460px);
+  opacity: 0.11;
+  transform: translate(-50%, -50%);
+  filter: grayscale(0.05) saturate(0.95);
+}
+
 .quote-mock-header,
 .quote-mock-body {
   position: relative;
@@ -944,6 +953,10 @@
   .quote-mock-logo {
     width: 120px;
   }
+
+  .quote-mock-watermark-logo {
+    width: min(54vw, 380px);
+  }
 }
 
 @media (max-width: 620px) {
@@ -1160,6 +1173,10 @@
 
   .quote-mock-logo {
     width: 100px;
+  }
+
+  .quote-mock-watermark-logo {
+    width: min(62vw, 260px);
   }
 
   .quote-mock-title-block {

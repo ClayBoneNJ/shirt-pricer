@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v20'
+const APP_VERSION = 'v21'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1213,6 +1213,11 @@ function App() {
               }}
             >
               <div className="quote-mock-watermarks" aria-hidden="true">
+                <img
+                  src={`${ASSET_BASE_URL}company-logo.png`}
+                  alt=""
+                  className="quote-mock-watermark quote-mock-watermark-logo"
+                />
                 {mockFrontGraphic ? (
                   <img
                     src={mockFrontGraphic.url}
