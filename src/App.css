@@ -533,8 +533,8 @@
   position: relative;
   overflow: hidden;
   display: grid;
-  gap: 14px;
-  padding: 20px;
+  gap: 10px;
+  padding: 18px 18px 14px;
   border-radius: 28px;
   background:
     radial-gradient(circle at top left, rgba(var(--quote-accent), 0.34), transparent 28%),
@@ -550,7 +550,7 @@
   left: 0;
   z-index: 0;
   width: 100%;
-  height: 82%;
+  height: 78%;
   object-fit: cover;
   object-position: center top;
   filter: hue-rotate(var(--quote-hue)) saturate(1.35) brightness(0.72) contrast(1.08);
@@ -607,7 +607,7 @@
 .quote-mock-header {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 16px;
+  gap: 14px;
   align-items: center;
 }
 
@@ -636,7 +636,7 @@
 .quote-mock-body {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 4px;
+  gap: 0;
   align-items: start;
 }
 
@@ -696,6 +696,7 @@
   grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
   gap: 14px;
   padding: 16px 18px;
+  margin-top: -18px;
   border: 1px solid rgba(17, 24, 39, 0.08);
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.96);
