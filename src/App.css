@@ -518,11 +518,21 @@
   background:
     radial-gradient(circle at top left, rgba(var(--quote-accent), 0.34), transparent 28%),
     radial-gradient(circle at bottom right, rgba(var(--quote-base), 0.24), transparent 32%),
-    linear-gradient(180deg, rgba(17, 23, 36, 0.88), rgba(24, 29, 45, 0.92)),
-    var(--quote-background-image);
+    linear-gradient(180deg, rgba(17, 23, 36, 0.84), rgba(24, 29, 45, 0.88));
+  isolation: isolate;
+}
+
+.quote-mock-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--quote-background-image);
   background-size: cover;
   background-position: center;
-  background-blend-mode: screen, screen, multiply, normal;
+  filter: hue-rotate(var(--quote-hue)) saturate(1.35) brightness(0.72) contrast(1.08);
+  transform: scale(1.02);
+  opacity: 0.72;
 }
 
 .quote-mock-watermarks {
@@ -530,6 +540,7 @@
   inset: 0;
   pointer-events: none;
   overflow: hidden;
+  z-index: 1;
 }
 
 .quote-mock-watermark {
@@ -566,7 +577,7 @@
 .quote-mock-header,
 .quote-mock-body {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .quote-mock-header {

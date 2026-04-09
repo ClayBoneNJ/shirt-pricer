@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v22'
+const APP_VERSION = 'v23'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -220,6 +220,31 @@ const hexToRgb = (hex) => {
     green: (parsed >> 8) & 255,
     blue: parsed & 255,
   }
+}
+
+const rgbToHue = ({ red, green, blue }) => {
+  const normalizedRed = red / 255
+  const normalizedGreen = green / 255
+  const normalizedBlue = blue / 255
+  const max = Math.max(normalizedRed, normalizedGreen, normalizedBlue)
+  const min = Math.min(normalizedRed, normalizedGreen, normalizedBlue)
+  const delta = max - min
+
+  if (delta === 0) {
+    return 0
+  }
+
+  let hue
+
+  if (max === normalizedRed) {
+    hue = ((normalizedGreen - normalizedBlue) / delta) % 6
+  } else if (max === normalizedGreen) {
+    hue = (normalizedBlue - normalizedRed) / delta + 2
+  } else {
+    hue = (normalizedRed - normalizedGreen) / delta + 4
+  }
+
+  return Math.round((hue * 60 + 360) % 360)
 }
 
 const getGraphicAccentColor = (imageUrl) =>
@@ -597,6 +622,7 @@ function App() {
   const quoteAccentCss = `${quoteAccentColor.red}, ${quoteAccentColor.green}, ${quoteAccentColor.blue}`
   const shirtColorRgb = hexToRgb(selection.shirtColor.hex)
   const quoteBaseCss = `${shirtColorRgb.red}, ${shirtColorRgb.green}, ${shirtColorRgb.blue}`
+  const quoteHueRotation = rgbToHue(quoteAccentColor)
 
   useEffect(() => {
     let isActive = true
@@ -1210,6 +1236,7 @@ function App() {
                 '--quote-accent': quoteAccentCss,
                 '--quote-base': quoteBaseCss,
                 '--quote-background-image': `url(${ASSET_BASE_URL}backgrond-blue.png)`,
+                '--quote-hue': `${quoteHueRotation}deg`,
               }}
             >
               <div className="quote-mock-watermarks" aria-hidden="true">
