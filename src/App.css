@@ -643,12 +643,12 @@
 }
 
 .quote-mock-card:first-child {
-  transform: rotate(-5deg) translateX(34px);
+  transform: rotate(-5deg) translateX(48px);
   transform-origin: center bottom;
 }
 
 .quote-mock-card:last-child {
-  transform: rotate(5deg) translateX(-34px);
+  transform: rotate(5deg) translateX(-48px);
   transform-origin: center bottom;
 }
 
@@ -663,7 +663,7 @@
 
 .quote-mock-canvas {
   position: relative;
-  width: min(100%, 540px);
+  width: min(100%, 600px);
   margin: 0 auto;
   aspect-ratio: 2 / 3;
 }
