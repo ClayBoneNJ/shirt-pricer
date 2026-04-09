@@ -539,10 +539,12 @@
 }
 
 .quote-mock-watermark-front {
-  top: 8%;
-  left: -3%;
-  width: min(34vw, 340px);
-  transform: rotate(-18deg);
+  top: 4%;
+  right: 2%;
+  left: auto;
+  width: min(30vw, 300px);
+  opacity: 0.18;
+  transform: rotate(10deg);
 }
 
 .quote-mock-watermark-back {
@@ -954,6 +956,10 @@
     width: 120px;
   }
 
+  .quote-mock-watermark-front {
+    width: min(34vw, 260px);
+  }
+
   .quote-mock-watermark-logo {
     width: min(54vw, 380px);
   }
@@ -1173,6 +1179,12 @@
 
   .quote-mock-logo {
     width: 100px;
+  }
+
+  .quote-mock-watermark-front {
+    top: 3%;
+    right: 3%;
+    width: min(42vw, 180px);
   }
 
   .quote-mock-watermark-logo {
