@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v45'
+const APP_VERSION = 'v46'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1354,10 +1354,15 @@ function App() {
               style={{
                 '--quote-accent': quoteAccentCss,
                 '--quote-base': quoteBaseCss,
-                '--quote-background-image': `url(${ASSET_BASE_URL}blue-background.png)`,
                 '--quote-hue': `${quoteHueRotation}deg`,
               }}
             >
+              <img
+                src={`${ASSET_BASE_URL}blue-background.png`}
+                alt=""
+                aria-hidden="true"
+                className="quote-mock-background"
+              />
               <div className="quote-mock-watermarks" aria-hidden="true">
                 <img
                   src={`${ASSET_BASE_URL}company-logo.png`}
