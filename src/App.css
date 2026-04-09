@@ -693,7 +693,7 @@
 }
 
 .quote-mock-card figcaption {
-  margin-top: 10px;
+  margin-top: -8px;
   font-size: clamp(1.4rem, 2vw, 2.1rem);
   font-weight: 800;
   letter-spacing: 0.08em;
