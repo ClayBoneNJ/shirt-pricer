@@ -1074,7 +1074,7 @@ function App() {
       frontWatermarkImage,
       backWatermarkImage,
     ] = await Promise.all([
-      loadImageFromSrc(`${ASSET_BASE_URL}blue-background.png`),
+      loadImageFromSrc(`${ASSET_BASE_URL}new-shirt-background.png`),
       loadImageFromSrc(`${ASSET_BASE_URL}company-logo.png`),
       loadImageFromSrc(selection.shirtColor.frontImage),
       loadImageFromSrc(selection.shirtColor.backImage),
@@ -1735,7 +1735,7 @@ function App() {
               }}
             >
               <img
-                src={`${ASSET_BASE_URL}blue-background.png`}
+                src={`${ASSET_BASE_URL}new-shirt-background.png`}
                 alt=""
                 aria-hidden="true"
                 className="quote-mock-background"
