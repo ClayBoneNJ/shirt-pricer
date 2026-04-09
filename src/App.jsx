@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v23'
+const APP_VERSION = 'v24'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -623,6 +623,9 @@ function App() {
   const shirtColorRgb = hexToRgb(selection.shirtColor.hex)
   const quoteBaseCss = `${shirtColorRgb.red}, ${shirtColorRgb.green}, ${shirtColorRgb.blue}`
   const quoteHueRotation = rgbToHue(quoteAccentColor)
+  const shirtMockupClassName = `shirt-mockup-image${
+    form.shirtColor === 'white' ? ' shirt-mockup-image-white' : ''
+  }`
 
   useEffect(() => {
     let isActive = true
@@ -1104,7 +1107,7 @@ function App() {
                     <img
                       src={selection.shirtColor.frontImage}
                       alt={`${selection.shirtColor.label} shirt front`}
-                      className="shirt-mockup-image"
+                      className={shirtMockupClassName}
                     />
                     {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
                       if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
@@ -1145,7 +1148,7 @@ function App() {
                     <img
                       src={selection.shirtColor.backImage}
                       alt={`${selection.shirtColor.label} shirt back`}
-                      className="shirt-mockup-image"
+                      className={shirtMockupClassName}
                     />
                     {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
                       if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
@@ -1285,7 +1288,7 @@ function App() {
                       <img
                         src={selection.shirtColor.frontImage}
                         alt={`${selection.shirtColor.label} ${selection.garmentLabel} front`}
-                        className="shirt-mockup-image"
+                        className={shirtMockupClassName}
                       />
                       {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
                         if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
@@ -1323,7 +1326,7 @@ function App() {
                       <img
                         src={selection.shirtColor.backImage}
                         alt={`${selection.shirtColor.label} ${selection.garmentLabel} back`}
-                        className="shirt-mockup-image"
+                        className={shirtMockupClassName}
                       />
                       {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
                         if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
