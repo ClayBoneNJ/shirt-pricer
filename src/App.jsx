@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v59'
+const APP_VERSION = 'v60'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -663,6 +663,10 @@ function App() {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')}-${selection.shirtColor.value}-${selection.quantity}-piece-quote.jpg`
+  const quoteHeaderName = customerName.trim() || 'Customer Name'
+  const quotePlacementSummary = selection.activeDecorations.length
+    ? selection.activeDecorations.join(' + ')
+    : 'No graphics selected'
 
   useEffect(() => {
     let isActive = true
@@ -1408,11 +1412,12 @@ function App() {
                   className="quote-mock-logo"
                 />
                 <div className="quote-mock-title-block">
-                  <h2>{selection.garmentLabel}</h2>
-                  <p>
-                    {selection.shirtColor.label} · {selection.quantity} pieces ·{' '}
-                    {selection.quantityTier.label}
-                  </p>
+                  <h2>{quoteHeaderName}</h2>
+                  <div className="quote-mock-title-meta">
+                    <p>{selection.garmentLabel}</p>
+                    <p>{selection.quantity} pieces</p>
+                    <p>{quotePlacementSummary}</p>
+                  </div>
                 </div>
               </div>
 
