@@ -618,8 +618,8 @@
 
 .quote-mock-body {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.85fr);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: start;
 }
 
@@ -672,48 +672,24 @@
   pointer-events: none;
 }
 
-.quote-mock-sidebar {
+.quote-mock-footer {
   display: grid;
-  gap: 16px;
-}
-
-.quote-mock-pricing {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
-.quote-mock-pricing > div,
-.quote-mock-lines > div {
+.quote-mock-footer > div {
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.05);
 }
 
-.quote-mock-pricing strong {
-  display: block;
-  margin-top: 6px;
-  color: var(--heading);
-  font-size: 1.7rem;
-}
-
-.quote-mock-lines {
-  display: grid;
-  gap: 10px;
-}
-
-.quote-mock-lines strong {
+.quote-mock-footer strong {
   display: block;
   margin-top: 5px;
   color: var(--heading);
   font-size: 1.15rem;
-}
-
-.quote-mock-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 .toggle-grid {
@@ -912,6 +888,10 @@
   }
 
   .quote-mock-garments {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quote-mock-footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1255,22 +1235,13 @@
     width: min(100%, 300px);
   }
 
-  .quote-mock-pricing > div,
-  .quote-mock-lines > div {
+  .quote-mock-footer > div {
     padding: 10px 12px;
     border-radius: 16px;
   }
 
-  .quote-mock-pricing strong {
+  .quote-mock-footer strong {
     font-size: 1.2rem;
-  }
-
-  .quote-mock-lines strong {
-    font-size: 1rem;
-  }
-
-  .quote-mock-tags {
-    gap: 8px;
   }
 
   .overview-card,

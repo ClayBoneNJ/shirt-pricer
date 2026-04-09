@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v34'
+const APP_VERSION = 'v35'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1366,53 +1366,24 @@ function App() {
                     </div>
                   </figure>
                 </div>
+              </div>
 
-                <div className="quote-mock-sidebar">
-                  <div className="quote-mock-pricing">
-                    <div>
-                      <span className="mini-label">Customer price</span>
-                      <strong>{formatMoney(selection.customerPrice)}</strong>
-                    </div>
-                    <div>
-                      <span className="mini-label">Profit</span>
-                      <strong>{formatMoney(selection.profit)}</strong>
-                    </div>
-                  </div>
-
-                  <div className="quote-mock-lines">
-                    <div>
-                      <span className="mini-label">Garment cost</span>
-                      <strong>{formatMoney(selection.blankCost)}</strong>
-                    </div>
-                    <div>
-                      <span className="mini-label">Graphics cost</span>
-                      <strong>{formatMoney(selection.decorationCost)}</strong>
-                    </div>
-                    <div>
-                      <span className="mini-label">Total cost</span>
-                      <strong>{formatMoney(selection.unitCost)}</strong>
-                    </div>
-                    <div>
-                      <span className="mini-label">Multiplier</span>
-                      <strong>{selection.quantityTier.multiplier.toFixed(2)}x</strong>
-                    </div>
-                    <div>
-                      <span className="mini-label">Suggested sale price</span>
-                      <strong>{formatMoney(selection.unitPrice)}</strong>
-                    </div>
-                  </div>
-
-                  <div className="quote-mock-tags">
-                    {selection.activeDecorations.length ? (
-                      selection.activeDecorations.map((item) => (
-                        <span key={`quote-tag-${item}`} className="active-tag">
-                          {item}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="active-tag muted">No decoration selected</span>
-                    )}
-                  </div>
+              <div className="quote-mock-footer">
+                <div>
+                  <span className="mini-label">Garment price</span>
+                  <strong>{formatMoney(selection.blankCost)}</strong>
+                </div>
+                <div>
+                  <span className="mini-label">Quantity</span>
+                  <strong>{selection.quantity}</strong>
+                </div>
+                <div>
+                  <span className="mini-label">Type</span>
+                  <strong>{selection.garmentLabel}</strong>
+                </div>
+                <div>
+                  <span className="mini-label">Total price</span>
+                  <strong>{formatMoney(selection.customerPrice)}</strong>
                 </div>
               </div>
             </div>
