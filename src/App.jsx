@@ -27,7 +27,8 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v24'
+const BRANDED_BACKGROUND_BASE_HUE = 220
+const APP_VERSION = 'v25'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -622,7 +623,7 @@ function App() {
   const quoteAccentCss = `${quoteAccentColor.red}, ${quoteAccentColor.green}, ${quoteAccentColor.blue}`
   const shirtColorRgb = hexToRgb(selection.shirtColor.hex)
   const quoteBaseCss = `${shirtColorRgb.red}, ${shirtColorRgb.green}, ${shirtColorRgb.blue}`
-  const quoteHueRotation = rgbToHue(quoteAccentColor)
+  const quoteHueRotation = rgbToHue(quoteAccentColor) - BRANDED_BACKGROUND_BASE_HUE
   const shirtMockupClassName = `shirt-mockup-image${
     form.shirtColor === 'white' ? ' shirt-mockup-image-white' : ''
   }`
