@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v57'
+const APP_VERSION = 'v58'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1052,10 +1052,12 @@ function App() {
             </label>
 
             <label className="field preview-control-field">
-              <span>Actual quantity</span>
+              <span>Quantity</span>
               <input
-                type="text"
-                inputMode="numeric"
+                className="quantity-step-input"
+                type="number"
+                min="1"
+                step="1"
                 value={form.quantity}
                 onChange={handleQuantityChange}
                 placeholder="24"
