@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { toJpeg } from 'html-to-image'
+import { toBlob } from 'html-to-image'
 import './App.css'
 
 const PRICING_CONFIG = {
@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v62'
+const APP_VERSION = 'v63'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -446,6 +446,11 @@ const sampleBorderBackground = (data, width, height) => {
 
   const pushSample = (x, y) => {
     const index = (y * width + x) * 4
+
+    if (data[index + 3] <= 24) {
+      return
+    }
+
     samples.push({
       red: data[index],
       green: data[index + 1],
@@ -461,6 +466,10 @@ const sampleBorderBackground = (data, width, height) => {
   for (let y = 1; y < height - 1; y += 1) {
     pushSample(0, y)
     pushSample(width - 1, y)
+  }
+
+  if (!samples.length) {
+    return null
   }
 
   const totals = samples.reduce(
@@ -480,6 +489,10 @@ const sampleBorderBackground = (data, width, height) => {
 }
 
 const isBackgroundLikePixel = (data, index, backgroundColor) => {
+  if (!backgroundColor || data[index + 3] <= 24) {
+    return false
+  }
+
   const red = data[index]
   const green = data[index + 1]
   const blue = data[index + 2]
@@ -490,7 +503,7 @@ const isBackgroundLikePixel = (data, index, backgroundColor) => {
   )
 }
 
-const removeWhiteBackgroundFromJpg = async (file) => {
+const removeBackgroundFromRaster = async (file) => {
   const image = await loadImageFile(file)
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d', { willReadFrequently: true })
@@ -508,6 +521,11 @@ const removeWhiteBackgroundFromJpg = async (file) => {
   const width = canvas.width
   const height = canvas.height
   const backgroundColor = sampleBorderBackground(data, width, height)
+
+  if (!backgroundColor) {
+    return readFileAsDataUrl(file)
+  }
+
   const visited = new Uint8Array(width * height)
   const queue = []
 
@@ -755,16 +773,16 @@ function App() {
       return
     }
 
-    const isJpgUpload = /image\/jpeg|image\/jpg/i.test(file.type) || /\.jpe?g$/i.test(file.name)
+    const isRasterUpload =
+      /image\/jpeg|image\/jpg|image\/png|image\/webp/i.test(file.type) ||
+      /\.(jpe?g|png|webp)$/i.test(file.name)
 
     let graphicUrl
 
     try {
-      graphicUrl = isJpgUpload
-        ? await removeWhiteBackgroundFromJpg(file)
-        : await readFileAsDataUrl(file)
+      graphicUrl = isRasterUpload ? await removeBackgroundFromRaster(file) : URL.createObjectURL(file)
     } catch {
-      graphicUrl = await readFileAsDataUrl(file)
+      graphicUrl = URL.createObjectURL(file)
     }
 
     setGraphics((current) => ({
@@ -785,16 +803,16 @@ function App() {
       return
     }
 
-    const isJpgUpload = /image\/jpeg|image\/jpg/i.test(file.type) || /\.jpe?g$/i.test(file.name)
+    const isRasterUpload =
+      /image\/jpeg|image\/jpg|image\/png|image\/webp/i.test(file.type) ||
+      /\.(jpe?g|png|webp)$/i.test(file.name)
 
     let graphicUrl
 
     try {
-      graphicUrl = isJpgUpload
-        ? await removeWhiteBackgroundFromJpg(file)
-        : await readFileAsDataUrl(file)
+      graphicUrl = isRasterUpload ? await removeBackgroundFromRaster(file) : URL.createObjectURL(file)
     } catch {
-      graphicUrl = await readFileAsDataUrl(file)
+      graphicUrl = URL.createObjectURL(file)
     }
 
     const sharedGraphic = {
@@ -900,12 +918,12 @@ function App() {
     }
   }, [isColorMenuOpen])
 
-  const buildQuoteMockJpg = async () => {
+  const buildQuoteMockJpgBlob = async () => {
     if (!quoteMockRef.current) {
       return null
     }
 
-    return toJpeg(quoteMockRef.current, {
+    return toBlob(quoteMockRef.current, {
       cacheBust: true,
       quality: 0.96,
       pixelRatio: 2,
@@ -913,23 +931,32 @@ function App() {
     })
   }
 
-  const downloadQuoteMockJpg = (dataUrl) => {
+  const downloadQuoteMockJpg = (blob) => {
+    const objectUrl = URL.createObjectURL(blob)
+
+    if (/iPad|iPhone|iPod/.test(window.navigator.userAgent)) {
+      window.open(objectUrl, '_blank', 'noopener,noreferrer')
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000)
+      return
+    }
+
     const link = document.createElement('a')
-    link.href = dataUrl
+    link.href = objectUrl
     link.download = quoteMockFileName
     document.body.append(link)
     link.click()
     link.remove()
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
   }
 
   const handleQuoteMockDownload = async () => {
     setIsQuoteMockExporting(true)
 
     try {
-      const dataUrl = await buildQuoteMockJpg()
+      const blob = await buildQuoteMockJpgBlob()
 
-      if (dataUrl) {
-        downloadQuoteMockJpg(dataUrl)
+      if (blob) {
+        downloadQuoteMockJpg(blob)
       }
     } finally {
       setIsQuoteMockExporting(false)
@@ -940,19 +967,17 @@ function App() {
     setIsQuoteMockExporting(true)
 
     try {
-      const dataUrl = await buildQuoteMockJpg()
+      const blob = await buildQuoteMockJpgBlob()
 
-      if (!dataUrl) {
+      if (!blob) {
         return
       }
 
       if (!navigator.share) {
-        downloadQuoteMockJpg(dataUrl)
+        downloadQuoteMockJpg(blob)
         return
       }
 
-      const response = await fetch(dataUrl)
-      const blob = await response.blob()
       const file = new File([blob], quoteMockFileName, { type: 'image/jpeg' })
 
       if (navigator.canShare?.({ files: [file] })) {
@@ -964,13 +989,13 @@ function App() {
         return
       }
 
-      downloadQuoteMockJpg(dataUrl)
+      downloadQuoteMockJpg(blob)
     } catch (error) {
       if (error?.name !== 'AbortError') {
-        const fallbackDataUrl = await buildQuoteMockJpg()
+        const fallbackBlob = await buildQuoteMockJpgBlob()
 
-        if (fallbackDataUrl) {
-          downloadQuoteMockJpg(fallbackDataUrl)
+        if (fallbackBlob) {
+          downloadQuoteMockJpg(fallbackBlob)
         }
       }
     } finally {
