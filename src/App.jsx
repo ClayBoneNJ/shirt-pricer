@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v64'
+const APP_VERSION = 'v65'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1063,11 +1063,30 @@ function App() {
     context.fillStyle = 'rgba(226, 232, 240, 0.82)'
     context.font = '700 24px Arial'
     context.textAlign = 'center'
-    context.fillText('FRONT MOCK', 520, 350)
-    context.fillText('BACK MOCK', 1280, 350)
+    context.fillText('FRONT MOCK', 520, 320)
+    context.fillText('BACK MOCK', 1280, 320)
 
-    drawContainedImage(context, shirtFrontImage, 170, 360, 700, 660, -5)
-    drawContainedImage(context, shirtBackImage, 930, 360, 700, 660, 5)
+    const frontStage = { x: 90, y: 300, width: 860, height: 760, rotation: -5 }
+    const backStage = { x: 850, y: 300, width: 860, height: 760, rotation: 5 }
+
+    drawContainedImage(
+      context,
+      shirtFrontImage,
+      frontStage.x,
+      frontStage.y,
+      frontStage.width,
+      frontStage.height,
+      frontStage.rotation,
+    )
+    drawContainedImage(
+      context,
+      shirtBackImage,
+      backStage.x,
+      backStage.y,
+      backStage.width,
+      backStage.height,
+      backStage.rotation,
+    )
 
     const drawPlacedGraphic = (image, view, field) => {
       if (!image) {
@@ -1075,9 +1094,7 @@ function App() {
       }
 
       const placement = graphicPlacements[field] ?? GRAPHIC_LAYOUTS[field]
-      const stage = view === 'front'
-        ? { x: 170, y: 360, width: 700, height: 660, rotation: -5 }
-        : { x: 930, y: 360, width: 700, height: 660, rotation: 5 }
+      const stage = view === 'front' ? frontStage : backStage
       const width = stage.width * (placement.width / 100)
       const x = stage.x + stage.width * (placement.x / 100)
       const y = stage.y + stage.height * (placement.y / 100)
