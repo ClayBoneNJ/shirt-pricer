@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v53'
+const APP_VERSION = 'v54'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1392,7 +1392,6 @@ function App() {
                   className="quote-mock-logo"
                 />
                 <div className="quote-mock-title-block">
-                  <span className="mini-label">Branded mock with pricing</span>
                   <h2>{selection.garmentLabel}</h2>
                   <p>
                     {selection.shirtColor.label} · {selection.quantity} pieces ·{' '}
