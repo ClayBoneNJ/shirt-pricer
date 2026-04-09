@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = 'v16'
+const APP_VERSION = 'v17'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -408,6 +408,7 @@ function App() {
   const [graphicPlacements, setGraphicPlacements] = useState({})
   const [dragState, setDragState] = useState(null)
   const [isColorMenuOpen, setIsColorMenuOpen] = useState(false)
+  const [isQuoteMockVisible, setIsQuoteMockVisible] = useState(false)
   const colorPickerRef = useRef(null)
 
   const selection = useMemo(() => {
@@ -480,6 +481,11 @@ function App() {
   }, [form])
 
   const sharedFrontGraphic = graphics.leftBreast ?? graphics.fullFront
+  const mockFrontGraphic =
+    (form.printLocations.fullFront && graphics.fullFront) ||
+    (form.printLocations.leftBreast && graphics.leftBreast) ||
+    null
+  const mockBackGraphic = form.printLocations.fullBack ? graphics.fullBack : null
 
   const handleApparelChange = (event) => {
     const apparelType = event.target.value
@@ -1016,6 +1022,18 @@ function App() {
         </article>
 
         <section className="glass-panel focus-panel pricing-summary-panel">
+          <div className="pricing-summary-header">
+            <div>
+              <span className="mini-label">Pricing snapshot</span>
+            </div>
+            <button
+              type="button"
+              className="quote-mock-button"
+              onClick={() => setIsQuoteMockVisible((current) => !current)}
+            >
+              {isQuoteMockVisible ? 'Hide mock with pricing' : 'Generate mock with pricing'}
+            </button>
+          </div>
           <div className="pricing-summary-grid">
             <div>
               <p className="mini-label">Garment cost</p>
@@ -1047,6 +1065,173 @@ function App() {
             </div>
           </div>
         </section>
+
+        {isQuoteMockVisible ? (
+          <section className="glass-panel focus-panel quote-mock-panel">
+            <div className="quote-mock-sheet">
+              <div className="quote-mock-watermarks" aria-hidden="true">
+                {mockFrontGraphic ? (
+                  <img
+                    src={mockFrontGraphic.url}
+                    alt=""
+                    className="quote-mock-watermark quote-mock-watermark-front"
+                  />
+                ) : null}
+                {mockBackGraphic ? (
+                  <img
+                    src={mockBackGraphic.url}
+                    alt=""
+                    className="quote-mock-watermark quote-mock-watermark-back"
+                  />
+                ) : null}
+              </div>
+
+              <div className="quote-mock-header">
+                <img
+                  src={`${ASSET_BASE_URL}company-logo.jpg`}
+                  alt="CJC Custom Apparel logo"
+                  className="quote-mock-logo"
+                />
+                <div className="quote-mock-title-block">
+                  <span className="mini-label">Branded mock with pricing</span>
+                  <h2>{selection.garmentLabel}</h2>
+                  <p>
+                    {selection.shirtColor.label} · {selection.quantity} pieces ·{' '}
+                    {selection.quantityTier.label}
+                  </p>
+                </div>
+              </div>
+
+              <div className="quote-mock-body">
+                <div className="quote-mock-garments">
+                  <figure className="quote-mock-card">
+                    <figcaption>Front mock</figcaption>
+                    <div className="quote-mock-canvas">
+                      <img
+                        src={selection.shirtColor.frontImage}
+                        alt={`${selection.shirtColor.label} ${selection.garmentLabel} front`}
+                        className="shirt-mockup-image"
+                      />
+                      {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
+                        if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
+                          return null
+                        }
+
+                        const placement = graphicPlacements[field] ?? config
+
+                        return (
+                          <div
+                            key={`quote-front-${field}`}
+                            className="graphic-overlay quote-mock-overlay"
+                            style={{
+                              left: `${placement.x}%`,
+                              top: `${placement.y}%`,
+                              width: `${placement.width}%`,
+                              transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
+                            }}
+                          >
+                            <img
+                              src={graphics[field].url}
+                              alt={graphics[field].name}
+                              className="graphic-overlay-image"
+                              draggable="false"
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </figure>
+
+                  <figure className="quote-mock-card">
+                    <figcaption>Back mock</figcaption>
+                    <div className="quote-mock-canvas">
+                      <img
+                        src={selection.shirtColor.backImage}
+                        alt={`${selection.shirtColor.label} ${selection.garmentLabel} back`}
+                        className="shirt-mockup-image"
+                      />
+                      {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
+                        if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
+                          return null
+                        }
+
+                        const placement = graphicPlacements[field] ?? config
+
+                        return (
+                          <div
+                            key={`quote-back-${field}`}
+                            className="graphic-overlay quote-mock-overlay"
+                            style={{
+                              left: `${placement.x}%`,
+                              top: `${placement.y}%`,
+                              width: `${placement.width}%`,
+                              transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
+                            }}
+                          >
+                            <img
+                              src={graphics[field].url}
+                              alt={graphics[field].name}
+                              className="graphic-overlay-image"
+                              draggable="false"
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </figure>
+                </div>
+
+                <div className="quote-mock-sidebar">
+                  <div className="quote-mock-pricing">
+                    <div>
+                      <span className="mini-label">Customer price</span>
+                      <strong>{formatMoney(selection.customerPrice)}</strong>
+                    </div>
+                    <div>
+                      <span className="mini-label">Profit</span>
+                      <strong>{formatMoney(selection.profit)}</strong>
+                    </div>
+                  </div>
+
+                  <div className="quote-mock-lines">
+                    <div>
+                      <span className="mini-label">Garment cost</span>
+                      <strong>{formatMoney(selection.blankCost)}</strong>
+                    </div>
+                    <div>
+                      <span className="mini-label">Graphics cost</span>
+                      <strong>{formatMoney(selection.decorationCost)}</strong>
+                    </div>
+                    <div>
+                      <span className="mini-label">Total cost</span>
+                      <strong>{formatMoney(selection.unitCost)}</strong>
+                    </div>
+                    <div>
+                      <span className="mini-label">Multiplier</span>
+                      <strong>{selection.quantityTier.multiplier.toFixed(2)}x</strong>
+                    </div>
+                    <div>
+                      <span className="mini-label">Suggested sale price</span>
+                      <strong>{formatMoney(selection.unitPrice)}</strong>
+                    </div>
+                  </div>
+
+                  <div className="quote-mock-tags">
+                    {selection.activeDecorations.length ? (
+                      selection.activeDecorations.map((item) => (
+                        <span key={`quote-tag-${item}`} className="active-tag">
+                          {item}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="active-tag muted">No decoration selected</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
       </section>
     </main>
