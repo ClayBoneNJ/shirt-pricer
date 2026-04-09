@@ -573,11 +573,11 @@
 }
 
 .quote-mock-watermark-logo {
-  top: 50%;
-  left: 50%;
+  left: -4%;
+  bottom: -8%;
   width: min(44vw, 460px);
-  opacity: 0.11;
-  transform: translate(-50%, -50%);
+  opacity: 0.12;
+  transform: rotate(-8deg);
   filter: grayscale(0.05) saturate(0.95);
 }
 
@@ -979,7 +979,9 @@
   }
 
   .quote-mock-watermark-logo {
-    width: min(54vw, 380px);
+    left: -6%;
+    bottom: -7%;
+    width: min(50vw, 340px);
   }
 }
 
@@ -1206,7 +1208,9 @@
   }
 
   .quote-mock-watermark-logo {
-    width: min(62vw, 260px);
+    left: -8%;
+    bottom: -4%;
+    width: min(56vw, 220px);
   }
 
   .quote-mock-title-block {
