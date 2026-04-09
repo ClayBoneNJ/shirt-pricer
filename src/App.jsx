@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v54'
+const APP_VERSION = 'v55'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -545,6 +545,7 @@ const removeWhiteBackgroundFromJpg = async (file) => {
 
 function App() {
   const [form, setForm] = useState(createDefaultForm)
+  const [customerName, setCustomerName] = useState('')
   const [graphics, setGraphics] = useState(DEFAULT_GRAPHICS)
   const [graphicPlacements, setGraphicPlacements] = useState({})
   const [dragState, setDragState] = useState(null)
@@ -953,9 +954,18 @@ function App() {
         <article className="glass-panel hero-panel">
           <div className="hero-copy">
             <span className="panel-kicker">DTF Apparel Pricer</span>
-            <h1>
-              Shirt Pricer <span className="version-badge">{APP_VERSION}</span>
-            </h1>
+            <div className="hero-customer-row">
+              <label className="field hero-customer-field">
+                <span>Customer name</span>
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(event) => setCustomerName(event.target.value)}
+                  placeholder="Enter customer name"
+                />
+              </label>
+              <span className="version-badge">{APP_VERSION}</span>
+            </div>
             <p>
               Live pricing, layout previews, and garment mockups for quick quoting.
             </p>

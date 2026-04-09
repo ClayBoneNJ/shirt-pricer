@@ -18,11 +18,19 @@
   gap: 10px;
 }
 
-.hero-copy h1 {
-  margin: 0;
-  color: var(--heading);
-  font-size: clamp(2rem, 5vw, 3.25rem);
-  line-height: 1.05;
+.hero-customer-row {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+}
+
+.hero-customer-field {
+  flex: 1;
+}
+
+.hero-customer-field input {
+  font-size: 1.15rem;
+  font-weight: 700;
 }
 
 .hero-copy p {
@@ -35,7 +43,7 @@
 .version-badge {
   display: inline-flex;
   align-items: center;
-  margin-left: 12px;
+  margin-left: 0;
   padding: 6px 12px;
   border: 1px solid rgba(126, 224, 200, 0.3);
   border-radius: 999px;
@@ -1049,9 +1057,10 @@
     gap: 4px;
   }
 
-  .hero-copy h1 {
-    font-size: clamp(1.45rem, 7vw, 1.9rem);
-    line-height: 1.08;
+  .hero-customer-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
   }
 
   .hero-copy p {
@@ -1059,7 +1068,7 @@
   }
 
   .version-badge {
-    margin-left: 6px;
+    align-self: flex-start;
     padding: 4px 8px;
   }
 
