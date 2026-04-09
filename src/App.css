@@ -545,11 +545,14 @@
 
 .quote-mock-background {
   position: absolute;
-  inset: 0;
+  top: 6%;
+  right: 0;
+  left: 0;
   z-index: 0;
   width: 100%;
-  height: 100%;
+  height: 82%;
   object-fit: cover;
+  object-position: center top;
   filter: hue-rotate(var(--quote-hue)) saturate(1.35) brightness(0.72) contrast(1.08);
   transform: scale(1.02);
   opacity: 0.72;
@@ -679,7 +682,7 @@
   position: relative;
   width: min(100%, 660px);
   margin: 0 auto;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 11 / 14;
 }
 
 .quote-mock-overlay {
