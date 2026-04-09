@@ -18,6 +18,12 @@
   gap: 10px;
 }
 
+.hero-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .hero-customer-row {
   display: flex;
   align-items: end;
@@ -1061,6 +1067,11 @@
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
+  }
+
+  .hero-kicker-row {
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .hero-copy p {

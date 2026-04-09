@@ -29,7 +29,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v56'
+const APP_VERSION = 'v57'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -969,7 +969,10 @@ function App() {
       <section className="studio-shell">
         <article className="glass-panel hero-panel">
           <div className="hero-copy">
-            <span className="panel-kicker">DTF Apparel Pricer</span>
+            <div className="hero-kicker-row">
+              <span className="panel-kicker">DTF Apparel Pricer</span>
+              <span className="version-badge">{APP_VERSION}</span>
+            </div>
             <div className="hero-customer-row">
               <label className="field hero-customer-field">
                 <span>Customer name</span>
@@ -980,7 +983,6 @@ function App() {
                   placeholder="Enter customer name"
                 />
               </label>
-              <span className="version-badge">{APP_VERSION}</span>
             </div>
             <p>
               Live pricing, layout previews, and garment mockups for quick quoting.
