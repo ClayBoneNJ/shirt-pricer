@@ -560,8 +560,8 @@
   top: 4%;
   right: 2%;
   left: auto;
-  width: min(30vw, 300px);
-  opacity: 0.18;
+  width: min(22vw, 210px);
+  opacity: 0.13;
   transform: rotate(10deg);
 }
 
@@ -967,7 +967,7 @@
   }
 
   .quote-mock-watermark-front {
-    width: min(34vw, 260px);
+    width: min(26vw, 180px);
   }
 
   .quote-mock-watermark-logo {
@@ -1196,7 +1196,7 @@
   .quote-mock-watermark-front {
     top: 3%;
     right: 3%;
-    width: min(42vw, 180px);
+    width: min(28vw, 120px);
   }
 
   .quote-mock-watermark-logo {
