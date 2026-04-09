@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v27'
+const APP_VERSION = 'v28'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -290,7 +290,7 @@ const getGraphicAccentColor = (imageUrl) =>
         const saturation = max - min
         const brightness = (red + green + blue) / 3
 
-        if (saturation < 32 || brightness < 28 || brightness > 235) {
+        if (saturation < 44 || brightness < 45 || brightness > 235) {
           continue
         }
 
@@ -298,7 +298,14 @@ const getGraphicAccentColor = (imageUrl) =>
         const bucketGreen = Math.round(green / 24) * 24
         const bucketBlue = Math.round(blue / 24) * 24
         const key = `${bucketRed}-${bucketGreen}-${bucketBlue}`
-        const score = saturation + alpha / 12
+        const dominance = max - brightness
+        const brightnessWeight = brightness / 255
+        const saturationWeight = saturation / 255
+        const score =
+          saturationWeight * saturation * 2.2 +
+          brightnessWeight * brightness * 1.6 +
+          dominance * 1.8 +
+          alpha / 16
         const current = buckets.get(key) ?? {
           red: 0,
           green: 0,
