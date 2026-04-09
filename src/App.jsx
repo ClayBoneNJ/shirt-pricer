@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v36'
+const APP_VERSION = 'v37'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1369,19 +1369,20 @@ function App() {
               </div>
 
               <div className="quote-mock-footer">
-                <div>
-                  <span className="mini-label">Garment price</span>
-                  <strong>{formatMoney(selection.blankCost)}</strong>
-                </div>
-                <div>
-                  <span className="mini-label">Quantity</span>
-                  <strong>{selection.quantity}</strong>
-                </div>
-                <div>
+                <div className="quote-mock-footer-pill quote-mock-footer-type">
                   <span className="mini-label">Type</span>
                   <strong>{selection.garmentLabel}</strong>
+                  <p>{selection.garmentNote}</p>
                 </div>
-                <div>
+                <div className="quote-mock-footer-pill">
+                  <span className="mini-label">Customer price per garment</span>
+                  <strong>{formatMoney(selection.unitPrice)}</strong>
+                </div>
+                <div className="quote-mock-footer-pill">
+                  <span className="mini-label">How many</span>
+                  <strong>{selection.quantity}</strong>
+                </div>
+                <div className="quote-mock-footer-pill">
                   <span className="mini-label">Total price</span>
                   <strong>{formatMoney(selection.customerPrice)}</strong>
                 </div>

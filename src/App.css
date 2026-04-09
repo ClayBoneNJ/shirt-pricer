@@ -643,12 +643,12 @@
 }
 
 .quote-mock-card:first-child {
-  transform: rotate(-5deg) translateX(48px);
+  transform: rotate(-5deg) translateX(62px);
   transform-origin: center bottom;
 }
 
 .quote-mock-card:last-child {
-  transform: rotate(5deg) translateX(-48px);
+  transform: rotate(5deg) translateX(-62px);
   transform-origin: center bottom;
 }
 
@@ -663,7 +663,7 @@
 
 .quote-mock-canvas {
   position: relative;
-  width: min(100%, 600px);
+  width: min(100%, 660px);
   margin: 0 auto;
   aspect-ratio: 2 / 3;
 }
@@ -678,7 +678,7 @@
   gap: 12px;
 }
 
-.quote-mock-footer > div {
+.quote-mock-footer-pill {
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
@@ -690,6 +690,18 @@
   margin-top: 5px;
   color: var(--heading);
   font-size: 1.15rem;
+}
+
+.quote-mock-footer-type {
+  display: grid;
+  gap: 4px;
+}
+
+.quote-mock-footer-type p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
 }
 
 .toggle-grid {
@@ -1235,7 +1247,7 @@
     width: min(100%, 300px);
   }
 
-  .quote-mock-footer > div {
+  .quote-mock-footer-pill {
     padding: 10px 12px;
     border-radius: 16px;
   }
