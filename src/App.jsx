@@ -28,7 +28,7 @@ const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
-const APP_VERSION = 'v67'
+const APP_VERSION = 'v68'
 
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
@@ -1129,12 +1129,6 @@ function App() {
     context.fillText(`${selection.quantity} pieces`, 328, 214)
     context.fillText(quotePlacementSummary, 328, 256)
 
-    context.fillStyle = 'rgba(226, 232, 240, 0.82)'
-    context.font = '700 24px Arial'
-    context.textAlign = 'center'
-    context.fillText('FRONT MOCK', 520, 320)
-    context.fillText('BACK MOCK', 1280, 320)
-
     const frontStage = { x: 90, y: 300, width: 860, height: 760, rotation: -5 }
     const backStage = { x: 850, y: 300, width: 860, height: 760, rotation: 5 }
 
@@ -1188,6 +1182,12 @@ function App() {
 
       drawPlacedGraphic(graphicImages[field], 'back', field)
     })
+
+    context.fillStyle = 'rgba(226, 232, 240, 0.82)'
+    context.font = '700 24px Arial'
+    context.textAlign = 'center'
+    context.fillText('Front', 520, 1088)
+    context.fillText('Back', 1280, 1088)
 
     drawRoundedRect(context, 70, exportHeight - 190, exportWidth - 140, 120, 28)
     context.fillStyle = 'rgba(255, 255, 255, 0.96)'
@@ -1774,7 +1774,6 @@ function App() {
               <div className="quote-mock-body">
                 <div className="quote-mock-garments">
                   <figure className="quote-mock-card">
-                    <figcaption>Front mock</figcaption>
                     <div className="quote-mock-canvas">
                       <img
                         src={selection.shirtColor.frontImage}
@@ -1809,10 +1808,10 @@ function App() {
                         )
                       })}
                     </div>
+                    <figcaption>Front</figcaption>
                   </figure>
 
                   <figure className="quote-mock-card">
-                    <figcaption>Back mock</figcaption>
                     <div className="quote-mock-canvas">
                       <img
                         src={selection.shirtColor.backImage}
@@ -1847,6 +1846,7 @@ function App() {
                         )
                       })}
                     </div>
+                    <figcaption>Back</figcaption>
                   </figure>
                 </div>
               </div>
