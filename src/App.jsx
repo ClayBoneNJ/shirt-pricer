@@ -1074,7 +1074,7 @@ function App() {
       frontWatermarkImage,
       backWatermarkImage,
     ] = await Promise.all([
-      loadImageFromSrc(`${ASSET_BASE_URL}gray-background.png`),
+      loadImageFromSrc(`${ASSET_BASE_URL}gray-background-2.png`),
       loadImageFromSrc(`${ASSET_BASE_URL}company-logo.png`),
       loadImageFromSrc(selection.shirtColor.frontImage),
       loadImageFromSrc(selection.shirtColor.backImage),
@@ -1098,8 +1098,11 @@ function App() {
     context.fillRect(0, 0, exportWidth, exportHeight)
     context.globalCompositeOperation = 'luminosity'
     context.drawImage(backgroundImage, 0, 0, exportWidth, exportHeight)
+    context.globalCompositeOperation = 'color'
+    context.fillStyle = `rgba(${quoteAccentCss}, 0.9)`
+    context.fillRect(0, 0, exportWidth, exportHeight)
     context.globalCompositeOperation = 'multiply'
-    context.fillStyle = `rgba(${quoteAccentCss}, 0.56)`
+    context.fillStyle = `rgba(${quoteAccentCss}, 0.34)`
     context.fillRect(0, 0, exportWidth, exportHeight)
     const accentGlow = context.createRadialGradient(
       exportWidth * 0.78,
@@ -1109,7 +1112,7 @@ function App() {
       exportHeight * 0.24,
       exportWidth * 0.52,
     )
-    accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.34)`)
+    accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.56)`)
     accentGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
     context.globalCompositeOperation = 'screen'
     context.fillStyle = accentGlow
@@ -1757,7 +1760,7 @@ function App() {
               }}
             >
               <img
-                src={`${ASSET_BASE_URL}gray-background.png`}
+                src={`${ASSET_BASE_URL}gray-background-2.png`}
                 alt=""
                 aria-hidden="true"
                 className="quote-mock-background"
