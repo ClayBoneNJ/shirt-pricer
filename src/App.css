@@ -570,10 +570,10 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: hue-rotate(var(--quote-hue)) saturate(1.35) brightness(0.72) contrast(1.08);
+  filter: grayscale(1) saturate(0.15) brightness(0.64) contrast(1.08);
   transform: scale(1.08);
   transform-origin: center;
-  opacity: 0.72;
+  opacity: 0.88;
   pointer-events: none;
 }
 
@@ -583,10 +583,22 @@
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 78% 24%, rgba(var(--quote-accent), 0.34), transparent 34%),
-    linear-gradient(135deg, rgba(var(--quote-accent), 0.24), rgba(var(--quote-base), 0.14));
-  mix-blend-mode: soft-light;
-  opacity: 0.96;
+    radial-gradient(circle at 78% 24%, rgba(var(--quote-accent), 0.44), transparent 34%),
+    radial-gradient(circle at 22% 78%, rgba(var(--quote-accent), 0.22), transparent 38%),
+    linear-gradient(135deg, rgba(var(--quote-accent), 0.5), rgba(var(--quote-base), 0.18));
+  mix-blend-mode: multiply;
+  opacity: 0.98;
+}
+
+.quote-mock-background-tint::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(var(--quote-accent), 0.26), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(var(--quote-accent), 0.08));
+  mix-blend-mode: screen;
+  opacity: 0.86;
 }
 
 .quote-mock-watermarks {

@@ -1093,8 +1093,13 @@ function App() {
     context.save()
     context.clip()
     context.drawImage(backgroundImage, 0, 0, exportWidth, exportHeight)
-    context.globalCompositeOperation = 'soft-light'
-    context.fillStyle = `rgba(${quoteAccentCss}, 0.52)`
+    context.globalCompositeOperation = 'saturation'
+    context.fillStyle = 'rgba(128, 128, 128, 1)'
+    context.fillRect(0, 0, exportWidth, exportHeight)
+    context.globalCompositeOperation = 'luminosity'
+    context.drawImage(backgroundImage, 0, 0, exportWidth, exportHeight)
+    context.globalCompositeOperation = 'multiply'
+    context.fillStyle = `rgba(${quoteAccentCss}, 0.56)`
     context.fillRect(0, 0, exportWidth, exportHeight)
     const accentGlow = context.createRadialGradient(
       exportWidth * 0.78,
@@ -1104,8 +1109,9 @@ function App() {
       exportHeight * 0.24,
       exportWidth * 0.52,
     )
-    accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.42)`)
+    accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.34)`)
     accentGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+    context.globalCompositeOperation = 'screen'
     context.fillStyle = accentGlow
     context.fillRect(0, 0, exportWidth, exportHeight)
     context.globalCompositeOperation = 'source-over'
