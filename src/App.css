@@ -579,35 +579,11 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: grayscale(1) saturate(0.08) brightness(0.7) contrast(1.14);
+  filter: hue-rotate(var(--quote-hue)) saturate(1.35) brightness(0.72) contrast(1.08);
   transform: scale(1.08);
   transform-origin: center;
-  opacity: 0.86;
+  opacity: 0.72;
   pointer-events: none;
-}
-
-.quote-mock-background-tint {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 76% 22%, rgba(var(--quote-accent), 0.56), transparent 36%),
-    radial-gradient(circle at 18% 82%, rgba(var(--quote-accent), 0.34), transparent 42%),
-    linear-gradient(135deg, rgba(var(--quote-accent), 0.58), rgba(var(--quote-base), 0.2));
-  mix-blend-mode: color;
-  opacity: 0.88;
-}
-
-.quote-mock-background-tint::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 70% 20%, rgba(var(--quote-accent), 0.28), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(var(--quote-accent), 0.14));
-  mix-blend-mode: overlay;
-  opacity: 0.82;
 }
 
 .quote-mock-watermarks {
