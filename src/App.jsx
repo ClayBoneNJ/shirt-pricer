@@ -606,6 +606,132 @@ const drawOverlayImage = (context, image, x, y, width, rotation = 0) => {
   context.restore()
 }
 
+const clampUnit = (value) => Math.min(1, Math.max(0, value))
+
+const rgbToHsl = (red, green, blue) => {
+  const normalizedRed = red / 255
+  const normalizedGreen = green / 255
+  const normalizedBlue = blue / 255
+  const max = Math.max(normalizedRed, normalizedGreen, normalizedBlue)
+  const min = Math.min(normalizedRed, normalizedGreen, normalizedBlue)
+  const lightness = (max + min) / 2
+
+  if (max === min) {
+    return { hue: 0, saturation: 0, lightness }
+  }
+
+  const delta = max - min
+  const saturation =
+    lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min)
+
+  let hue
+
+  if (max === normalizedRed) {
+    hue = (normalizedGreen - normalizedBlue) / delta + (normalizedGreen < normalizedBlue ? 6 : 0)
+  } else if (max === normalizedGreen) {
+    hue = (normalizedBlue - normalizedRed) / delta + 2
+  } else {
+    hue = (normalizedRed - normalizedGreen) / delta + 4
+  }
+
+  return { hue: hue / 6, saturation, lightness }
+}
+
+const hueToRgb = (p, q, t) => {
+  let value = t
+
+  if (value < 0) {
+    value += 1
+  }
+
+  if (value > 1) {
+    value -= 1
+  }
+
+  if (value < 1 / 6) {
+    return p + (q - p) * 6 * value
+  }
+
+  if (value < 1 / 2) {
+    return q
+  }
+
+  if (value < 2 / 3) {
+    return p + (q - p) * (2 / 3 - value) * 6
+  }
+
+  return p
+}
+
+const hslToRgb = (hue, saturation, lightness) => {
+  if (saturation === 0) {
+    const value = Math.round(lightness * 255)
+    return { red: value, green: value, blue: value }
+  }
+
+  const q =
+    lightness < 0.5
+      ? lightness * (1 + saturation)
+      : lightness + saturation - lightness * saturation
+  const p = 2 * lightness - q
+
+  return {
+    red: Math.round(hueToRgb(p, q, hue + 1 / 3) * 255),
+    green: Math.round(hueToRgb(p, q, hue) * 255),
+    blue: Math.round(hueToRgb(p, q, hue - 1 / 3) * 255),
+  }
+}
+
+const getAdjustedBackgroundCanvas = (
+  image,
+  width,
+  height,
+  { hueRotation = 0, saturation = 1, brightness = 1, contrast = 1 } = {},
+) => {
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+
+  if (!context) {
+    return image
+  }
+
+  canvas.width = width
+  canvas.height = height
+  context.drawImage(image, 0, 0, width, height)
+
+  const imageData = context.getImageData(0, 0, width, height)
+  const { data } = imageData
+  const hueOffset = hueRotation / 360
+
+  for (let index = 0; index < data.length; index += 4) {
+    const alpha = data[index + 3]
+
+    if (alpha === 0) {
+      continue
+    }
+
+    const hsl = rgbToHsl(data[index], data[index + 1], data[index + 2])
+    const adjustedHue = (hsl.hue + hueOffset + 1) % 1
+    const adjustedSaturation = clampUnit(hsl.saturation * saturation)
+    const adjustedRgb = hslToRgb(adjustedHue, adjustedSaturation, hsl.lightness)
+
+    const contrastedRed =
+      (((adjustedRgb.red / 255 - 0.5) * contrast + 0.5) * brightness)
+    const contrastedGreen =
+      (((adjustedRgb.green / 255 - 0.5) * contrast + 0.5) * brightness)
+    const contrastedBlue =
+      (((adjustedRgb.blue / 255 - 0.5) * contrast + 0.5) * brightness)
+
+    data[index] = Math.round(clampUnit(contrastedRed) * 255)
+    data[index + 1] = Math.round(clampUnit(contrastedGreen) * 255)
+    data[index + 2] = Math.round(clampUnit(contrastedBlue) * 255)
+  }
+
+  context.putImageData(imageData, 0, 0)
+
+  return canvas
+}
+
 const getColorDistance = (red, green, blue, target) =>
   Math.sqrt(
     (red - target.red) ** 2 +
@@ -1144,9 +1270,13 @@ function App() {
     drawRoundedRect(context, 0, 0, exportWidth, exportHeight, 44)
     context.save()
     context.clip()
-    context.filter = `hue-rotate(${quoteHueRotation}deg) saturate(1.35) brightness(0.72) contrast(1.08)`
-    context.drawImage(backgroundImage, 0, 0, exportWidth, exportHeight)
-    context.filter = 'none'
+    const adjustedBackgroundImage = getAdjustedBackgroundCanvas(backgroundImage, exportWidth, exportHeight, {
+      hueRotation: quoteHueRotation,
+      saturation: 1.35,
+      brightness: 0.72,
+      contrast: 1.08,
+    })
+    context.drawImage(adjustedBackgroundImage, 0, 0, exportWidth, exportHeight)
     context.fillStyle = 'rgba(8, 14, 22, 0.54)'
     context.fillRect(0, 0, exportWidth, exportHeight)
 

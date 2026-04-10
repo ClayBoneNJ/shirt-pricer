@@ -596,23 +596,24 @@
 
 .quote-mock-watermark {
   position: absolute;
-  opacity: 0.08;
-  filter: grayscale(0.1) saturate(1.1);
+  opacity: 0.14;
+  filter: grayscale(0.08) saturate(1.14);
 }
 
 .quote-mock-watermark-front {
-  top: -8%;
-  right: -6%;
+  top: -4%;
+  right: -1%;
   left: auto;
   width: min(46vw, 520px);
-  opacity: 0.22;
+  opacity: 0.3;
   transform: rotate(14deg);
 }
 
 .quote-mock-watermark-back {
-  right: -4%;
-  bottom: 4%;
+  right: 3%;
+  bottom: 9%;
   width: min(38vw, 380px);
+  opacity: 0.2;
   transform: rotate(14deg);
 }
 
@@ -634,36 +635,53 @@
 .quote-mock-header {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 10px;
+  gap: 14px;
   align-items: center;
+  width: fit-content;
+  max-width: min(100%, 560px);
+  margin-top: 28px;
+  margin-left: 8px;
+  padding: 2px 18px 2px 4px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  overflow: visible;
 }
 
 .quote-mock-logo {
-  width: 150px;
+  width: 148px;
   max-width: 100%;
+  margin: -34px -6px -36px 0;
   filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.24));
 }
 
 .quote-mock-title-block {
   display: grid;
-  gap: 5px;
+  gap: 2px;
 }
 
 .quote-mock-title-block h2 {
   margin: 0;
   font-size: clamp(1.35rem, 2.2vw, 2.1rem);
+  color: #111827;
 }
 
 .quote-mock-title-meta {
-  display: grid;
-  gap: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .quote-mock-title-meta p {
   margin: 0;
-  color: var(--muted);
-  font-size: 0.8rem;
-  line-height: 1.2;
+  padding: 0.18rem 0.56rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  color: #334155;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 .quote-mock-body {
@@ -685,13 +703,14 @@
 
 .quote-mock-card {
   display: grid;
-  gap: 2px;
+  gap: 0;
   margin: 0;
-  padding: 0 0 12px;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
   backdrop-filter: none;
+  position: relative;
 }
 
 .quote-mock-card:first-child {
@@ -705,13 +724,23 @@
 }
 
 .quote-mock-card figcaption {
-  margin-top: -14px;
-  font-size: clamp(1.4rem, 2vw, 2.1rem);
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  position: absolute;
+  left: 50%;
+  bottom: 58px;
+  transform: translateX(-50%);
+  padding: 0.34rem 0.92rem;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  font-size: clamp(0.92rem, 1.2vw, 1.08rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(241, 245, 249, 0.9);
+  color: #111827;
   text-align: center;
+  z-index: 3;
+  white-space: nowrap;
 }
 
 .quote-mock-canvas {
@@ -1043,8 +1072,8 @@
   }
 
   .quote-mock-watermark-front {
-    top: -7%;
-    right: -5%;
+    top: -3%;
+    right: 1%;
     width: min(44vw, 360px);
   }
 
@@ -1284,16 +1313,27 @@
     gap: 10px;
     justify-items: center;
     text-align: center;
+    width: 100%;
+    margin-top: 18px;
+    margin-left: 0;
+    padding: 2px 14px 8px;
   }
 
   .quote-mock-logo {
-    width: 100px;
+    width: 108px;
+    margin: -24px 0 -26px;
   }
 
   .quote-mock-watermark-front {
-    top: -5%;
-    right: -3%;
+    top: -2%;
+    right: 2%;
     width: min(46vw, 250px);
+  }
+
+  .quote-mock-watermark-back {
+    right: 6%;
+    bottom: 11%;
+    width: min(40vw, 220px);
   }
 
   .quote-mock-watermark-logo {
@@ -1310,8 +1350,12 @@
     font-size: 1.35rem;
   }
 
+  .quote-mock-title-meta {
+    justify-content: center;
+  }
+
   .quote-mock-title-block p {
-    font-size: 0.88rem;
+    font-size: 0.82rem;
   }
 
   .quote-mock-body,
@@ -1335,6 +1379,10 @@
   .quote-mock-info-bar {
     padding: 14px 16px;
     border-radius: 22px;
+  }
+
+  .quote-mock-card figcaption {
+    bottom: 42px;
   }
 
   .quote-mock-info-bar strong {
