@@ -43,6 +43,14 @@ const QUOTE_BACKGROUNDS = [
     value: 'blurry-dots-bg.png',
     label: 'Blurry dots',
   },
+  {
+    value: 'yellow-splash.png',
+    label: 'Yellow splash',
+  },
+  {
+    value: 'orange-and-blue-background.png',
+    label: 'Orange and blue',
+  },
 ]
 
 const getGarmentImagePrefix = (apparelType) => {
