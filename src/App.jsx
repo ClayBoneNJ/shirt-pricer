@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
+import packageJson from '../package.json'
 
 const PRICING_CONFIG = {
   blankPrices: {
@@ -27,7 +28,14 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const APP_VERSION = __APP_VERSION__
+const formatAppVersion = (version) => {
+  const versionParts = version.split('.').map((part) => Number.parseInt(part, 10) || 0)
+  const displayVersionNumber = versionParts[0] * 10000 + versionParts[1] * 100 + versionParts[2]
+
+  return `v${String(displayVersionNumber).padStart(3, '0')}`
+}
+
+const APP_VERSION = formatAppVersion(packageJson.version)
 
 const QUOTE_BACKGROUNDS = [
   {
