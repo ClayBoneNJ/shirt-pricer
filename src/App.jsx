@@ -1099,10 +1099,10 @@ function App() {
     context.globalCompositeOperation = 'luminosity'
     context.drawImage(backgroundImage, 0, 0, exportWidth, exportHeight)
     context.globalCompositeOperation = 'color'
-    context.fillStyle = `rgba(${quoteAccentCss}, 0.9)`
+    context.fillStyle = `rgba(${quoteAccentCss}, 0.68)`
     context.fillRect(0, 0, exportWidth, exportHeight)
     context.globalCompositeOperation = 'multiply'
-    context.fillStyle = `rgba(${quoteAccentCss}, 0.34)`
+    context.fillStyle = `rgba(${quoteAccentCss}, 0.22)`
     context.fillRect(0, 0, exportWidth, exportHeight)
     const accentGlow = context.createRadialGradient(
       exportWidth * 0.78,
@@ -1112,7 +1112,7 @@ function App() {
       exportHeight * 0.24,
       exportWidth * 0.52,
     )
-    accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.56)`)
+    accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.42)`)
     accentGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
     context.globalCompositeOperation = 'screen'
     context.fillStyle = accentGlow
