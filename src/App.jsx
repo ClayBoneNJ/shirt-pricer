@@ -27,29 +27,33 @@ const PRICING_CONFIG = {
 const DEFAULT_APPAREL = 'standard'
 const ROCK_BOTTOM_UNIT_PRICE = 8.5
 const ASSET_BASE_URL = import.meta.env.BASE_URL
-const BRANDED_BACKGROUND_BASE_HUE = 220
 const APP_VERSION = __APP_VERSION__
 
 const QUOTE_BACKGROUNDS = [
   {
     value: 'gray-background-2.png',
     label: 'Gray grunge',
+    baseHue: 220,
   },
   {
     value: 'gray-background.png',
     label: 'Gray texture',
+    baseHue: 220,
   },
   {
     value: 'blurry-dots-bg.png',
     label: 'Blurry dots',
+    baseHue: 220,
   },
   {
     value: 'yellow-splash.png',
     label: 'Yellow splash',
+    baseHue: 48,
   },
   {
     value: 'orange-and-blue-background.png',
     label: 'Orange and blue',
+    baseHue: 32,
   },
 ]
 
@@ -832,7 +836,10 @@ function App() {
   const quoteAccentCss = `${quoteAccentColor.red}, ${quoteAccentColor.green}, ${quoteAccentColor.blue}`
   const shirtColorRgb = hexToRgb(selection.shirtColor.hex)
   const quoteBaseCss = `${shirtColorRgb.red}, ${shirtColorRgb.green}, ${shirtColorRgb.blue}`
-  const quoteHueRotation = rgbToHue(quoteAccentColor) - BRANDED_BACKGROUND_BASE_HUE
+  const quoteBackgroundConfig =
+    QUOTE_BACKGROUNDS.find((background) => background.value === quoteBackground) ??
+    QUOTE_BACKGROUNDS[0]
+  const quoteHueRotation = rgbToHue(quoteAccentColor) - quoteBackgroundConfig.baseHue
   const shirtMockupClassName = `shirt-mockup-image${
     form.shirtColor === 'white' ? ' shirt-mockup-image-white' : ''
   }`
