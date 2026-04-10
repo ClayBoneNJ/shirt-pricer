@@ -31,29 +31,54 @@ const APP_VERSION = __APP_VERSION__
 
 const QUOTE_BACKGROUNDS = [
   {
-    value: 'gray-background-2.png',
+    value: 'backgrounds/gray-grunge.png',
     label: 'Gray grunge',
     baseHue: 220,
   },
   {
-    value: 'gray-background.png',
+    value: 'backgrounds/gray-texture.png',
     label: 'Gray texture',
     baseHue: 220,
   },
   {
-    value: 'blurry-dots-bg.png',
+    value: 'backgrounds/blurry-dots.png',
     label: 'Blurry dots',
-    baseHue: 220,
+    baseHue: 213,
   },
   {
-    value: 'yellow-splash.png',
+    value: 'backgrounds/yellow-splash.png',
     label: 'Yellow splash',
-    baseHue: 48,
+    baseHue: 39,
   },
   {
-    value: 'orange-and-blue-background.png',
+    value: 'backgrounds/orange-blue.png',
     label: 'Orange and blue',
-    baseHue: 32,
+    baseHue: 51,
+  },
+  {
+    value: 'backgrounds/blue-splash.png',
+    label: 'Blue splash',
+    baseHue: 209,
+  },
+  {
+    value: 'backgrounds/blue-original-alt.png',
+    label: 'Blue alternate',
+    baseHue: 201,
+  },
+  {
+    value: 'backgrounds/swirl.png',
+    label: 'Swirl',
+    baseHue: 209,
+  },
+  {
+    value: 'backgrounds/classic-blue.png',
+    label: 'Classic blue',
+    baseHue: 201,
+  },
+  {
+    value: 'backgrounds/experimental-blue.png',
+    label: 'Experimental blue',
+    baseHue: 112,
   },
 ]
 
