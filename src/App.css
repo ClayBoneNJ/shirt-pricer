@@ -577,6 +577,18 @@
   pointer-events: none;
 }
 
+.quote-mock-background-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 78% 24%, rgba(var(--quote-accent), 0.34), transparent 34%),
+    linear-gradient(135deg, rgba(var(--quote-accent), 0.24), rgba(var(--quote-base), 0.14));
+  mix-blend-mode: soft-light;
+  opacity: 0.96;
+}
+
 .quote-mock-watermarks {
   position: absolute;
   inset: 0;

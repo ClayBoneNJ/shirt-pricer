@@ -1093,6 +1093,22 @@ function App() {
     context.save()
     context.clip()
     context.drawImage(backgroundImage, 0, 0, exportWidth, exportHeight)
+    context.globalCompositeOperation = 'soft-light'
+    context.fillStyle = `rgba(${quoteAccentCss}, 0.52)`
+    context.fillRect(0, 0, exportWidth, exportHeight)
+    const accentGlow = context.createRadialGradient(
+      exportWidth * 0.78,
+      exportHeight * 0.24,
+      0,
+      exportWidth * 0.78,
+      exportHeight * 0.24,
+      exportWidth * 0.52,
+    )
+    accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.42)`)
+    accentGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+    context.fillStyle = accentGlow
+    context.fillRect(0, 0, exportWidth, exportHeight)
+    context.globalCompositeOperation = 'source-over'
     context.fillStyle = 'rgba(8, 14, 22, 0.54)'
     context.fillRect(0, 0, exportWidth, exportHeight)
 
@@ -1739,6 +1755,10 @@ function App() {
                 alt=""
                 aria-hidden="true"
                 className="quote-mock-background"
+              />
+              <div
+                aria-hidden="true"
+                className="quote-mock-background-tint"
               />
               <div className="quote-mock-watermarks" aria-hidden="true">
                 <img
