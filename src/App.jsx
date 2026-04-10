@@ -30,6 +30,21 @@ const ASSET_BASE_URL = import.meta.env.BASE_URL
 const BRANDED_BACKGROUND_BASE_HUE = 220
 const APP_VERSION = __APP_VERSION__
 
+const QUOTE_BACKGROUNDS = [
+  {
+    value: 'gray-background-2.png',
+    label: 'Gray grunge',
+  },
+  {
+    value: 'gray-background.png',
+    label: 'Gray texture',
+  },
+  {
+    value: 'blurry-dots-bg.png',
+    label: 'Blurry dots',
+  },
+]
+
 const getGarmentImagePrefix = (apparelType) => {
   if (apparelType === 'polo' || apparelType === 'hoodie') {
     return `${apparelType}-`
@@ -729,6 +744,7 @@ function App() {
   const [isQuoteMockVisible, setIsQuoteMockVisible] = useState(false)
   const [quoteAccentColor, setQuoteAccentColor] = useState(hexToRgb(SHIRT_COLORS[1].hex))
   const [isQuoteMockExporting, setIsQuoteMockExporting] = useState(false)
+  const [quoteBackground, setQuoteBackground] = useState(QUOTE_BACKGROUNDS[0].value)
   const quoteMockRef = useRef(null)
   const colorPickerRef = useRef(null)
 
@@ -820,6 +836,7 @@ function App() {
   const quotePlacementSummary = selection.activeDecorations.length
     ? selection.activeDecorations.join(' + ')
     : 'No graphics selected'
+  const quoteBackgroundSrc = `${ASSET_BASE_URL}${quoteBackground}`
 
   useEffect(() => {
     let isActive = true
@@ -1074,7 +1091,7 @@ function App() {
       frontWatermarkImage,
       backWatermarkImage,
     ] = await Promise.all([
-      loadImageFromSrc(`${ASSET_BASE_URL}gray-background-2.png`),
+      loadImageFromSrc(quoteBackgroundSrc),
       loadImageFromSrc(`${ASSET_BASE_URL}company-logo.png`),
       loadImageFromSrc(selection.shirtColor.frontImage),
       loadImageFromSrc(selection.shirtColor.backImage),
@@ -1687,6 +1704,20 @@ function App() {
               <span className="mini-label">Pricing snapshot</span>
             </div>
             <div className="quote-mock-actions">
+              <label className="field quote-background-field">
+                <span>Mock background</span>
+                <select
+                  className="spotlight-control"
+                  value={quoteBackground}
+                  onChange={(event) => setQuoteBackground(event.target.value)}
+                >
+                  {QUOTE_BACKGROUNDS.map((background) => (
+                    <option key={background.value} value={background.value}>
+                      {background.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {isQuoteMockVisible ? (
                 <>
                   <button
@@ -1760,7 +1791,7 @@ function App() {
               }}
             >
               <img
-                src={`${ASSET_BASE_URL}gray-background-2.png`}
+                src={quoteBackgroundSrc}
                 alt=""
                 aria-hidden="true"
                 className="quote-mock-background"

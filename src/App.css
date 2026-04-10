@@ -537,7 +537,16 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: end;
   gap: 10px;
+}
+
+.quote-background-field {
+  min-width: min(240px, 100%);
+}
+
+.quote-background-field select {
+  min-height: 42px;
 }
 
 .quote-mock-panel {
@@ -1284,6 +1293,10 @@
   .quote-mock-actions {
     width: 100%;
     justify-content: stretch;
+  }
+
+  .quote-background-field {
+    width: 100%;
   }
 
   .quote-mock-actions .quote-mock-button {
