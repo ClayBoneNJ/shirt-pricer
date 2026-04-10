@@ -124,7 +124,7 @@ const SHIRT_COLORS = [
 const createDefaultForm = () => ({
   apparelType: DEFAULT_APPAREL,
   shirtColor: 'black',
-  quantity: '24',
+  quantity: '5',
   blankCost: PRICING_CONFIG.blankPrices[DEFAULT_APPAREL].cost.toFixed(2),
   transferPrices: {
     leftBreast: PRICING_CONFIG.transferPrices.leftBreast.cost.toFixed(2),
