@@ -107,12 +107,18 @@ const SHIRT_COLORS = [
   {
     value: 'navy',
     label: 'Navy',
-    hex: '#1d3557',
+    hex: '#0a1426',
   },
   {
     value: 'charcoal',
     label: 'Charcoal',
     hex: '#374151',
+  },
+  {
+    value: 'light-grey',
+    label: 'Light Grey',
+    hex: '#d6dbe2',
+    assetValue: 'heather',
   },
   {
     value: 'heather',
@@ -196,6 +202,14 @@ const DEFAULT_GRAPHICS = {
   rightSleeve: null,
 }
 
+const DEFAULT_BACKGROUND_REMOVAL = {
+  leftBreast: true,
+  fullFront: true,
+  fullBack: true,
+  leftSleeve: true,
+  rightSleeve: true,
+}
+
 const GRAPHIC_LAYOUTS = {
   leftBreast: {
     view: 'front',
@@ -241,6 +255,9 @@ const GRAPHIC_LAYOUTS = {
 
 const BACKGROUND_MATCH_THRESHOLD = 95
 const BACKGROUND_MATCH_SOFTNESS = 60
+const GRAPHIC_SIZE_STEP = 2
+const GRAPHIC_MIN_WIDTH = 6
+const GRAPHIC_MAX_WIDTH = 80
 
 const clampNumber = (value) => {
   const parsed = Number(value)
@@ -900,10 +917,27 @@ const removeBackgroundFromRaster = async (file) => {
   return canvas.toDataURL('image/png')
 }
 
+const buildGraphicUrl = async (file, shouldRemoveBackground) => {
+  const isRasterUpload =
+    /image\/jpeg|image\/jpg|image\/png|image\/webp/i.test(file.type) ||
+    /\.(jpe?g|png|webp)$/i.test(file.name)
+
+  if (!shouldRemoveBackground || !isRasterUpload) {
+    return URL.createObjectURL(file)
+  }
+
+  try {
+    return await removeBackgroundFromRaster(file)
+  } catch {
+    return URL.createObjectURL(file)
+  }
+}
+
 function App() {
   const [form, setForm] = useState(createDefaultForm)
   const [customerName, setCustomerName] = useState('')
   const [graphics, setGraphics] = useState(DEFAULT_GRAPHICS)
+  const [backgroundRemoval, setBackgroundRemoval] = useState(DEFAULT_BACKGROUND_REMOVAL)
   const [graphicPlacements, setGraphicPlacements] = useState({})
   const [dragState, setDragState] = useState(null)
   const [isColorMenuOpen, setIsColorMenuOpen] = useState(false)
@@ -925,6 +959,7 @@ function App() {
     const shirtColor =
       SHIRT_COLORS.find((color) => color.value === form.shirtColor) ?? SHIRT_COLORS[0]
     const garmentImagePrefix = getGarmentImagePrefix(form.apparelType)
+    const garmentAssetValue = shirtColor.assetValue ?? shirtColor.value
 
     const activeDecorations = [
       form.printLocations.leftBreast ? 'Left Breast' : null,
@@ -960,8 +995,8 @@ function App() {
       garmentNote: GARMENT_NOTES[form.apparelType],
       shirtColor: {
         ...shirtColor,
-        frontImage: `${ASSET_BASE_URL}shirts/${garmentImagePrefix}${shirtColor.value}-front.png`,
-        backImage: `${ASSET_BASE_URL}shirts/${garmentImagePrefix}${shirtColor.value}-back.png`,
+        frontImage: `${ASSET_BASE_URL}shirts/${garmentImagePrefix}${garmentAssetValue}-front.png`,
+        backImage: `${ASSET_BASE_URL}shirts/${garmentImagePrefix}${garmentAssetValue}-back.png`,
       },
       quantityTier,
       quantity,
@@ -982,6 +1017,7 @@ function App() {
   }, [form])
 
   const sharedFrontGraphic = graphics.leftBreast ?? graphics.fullFront
+  const activeFrontField = form.printLocations.leftBreast ? 'leftBreast' : 'fullFront'
   const mockFrontGraphic =
     (form.printLocations.fullFront && graphics.fullFront) ||
     (form.printLocations.leftBreast && graphics.leftBreast) ||
@@ -995,7 +1031,11 @@ function App() {
     QUOTE_BACKGROUNDS[0]
   const quoteHueRotation = rgbToHue(quoteAccentColor) - quoteBackgroundConfig.baseHue
   const shirtMockupClassName = `shirt-mockup-image${
-    form.shirtColor === 'white' ? ' shirt-mockup-image-white' : ''
+    form.shirtColor === 'white'
+      ? ' shirt-mockup-image-white'
+      : form.shirtColor === 'light-grey'
+        ? ' shirt-mockup-image-light-grey'
+        : ''
   }`
   const quoteMockFileName = `${selection.garmentLabel
     .toLowerCase()
@@ -1083,24 +1123,15 @@ function App() {
     if (!file) {
       return
     }
-
-    const isRasterUpload =
-      /image\/jpeg|image\/jpg|image\/png|image\/webp/i.test(file.type) ||
-      /\.(jpe?g|png|webp)$/i.test(file.name)
-
-    let graphicUrl
-
-    try {
-      graphicUrl = isRasterUpload ? await removeBackgroundFromRaster(file) : URL.createObjectURL(file)
-    } catch {
-      graphicUrl = URL.createObjectURL(file)
-    }
+    const shouldRemoveBackground = backgroundRemoval[field]
+    const graphicUrl = await buildGraphicUrl(file, shouldRemoveBackground)
 
     setGraphics((current) => ({
       ...current,
       [field]: {
         name: file.name,
         url: graphicUrl,
+        file,
       },
     }))
 
@@ -1113,22 +1144,14 @@ function App() {
     if (!file) {
       return
     }
-
-    const isRasterUpload =
-      /image\/jpeg|image\/jpg|image\/png|image\/webp/i.test(file.type) ||
-      /\.(jpe?g|png|webp)$/i.test(file.name)
-
-    let graphicUrl
-
-    try {
-      graphicUrl = isRasterUpload ? await removeBackgroundFromRaster(file) : URL.createObjectURL(file)
-    } catch {
-      graphicUrl = URL.createObjectURL(file)
-    }
+    const shouldRemoveBackground =
+      backgroundRemoval.leftBreast && backgroundRemoval.fullFront
+    const graphicUrl = await buildGraphicUrl(file, shouldRemoveBackground)
 
     const sharedGraphic = {
       name: file.name,
       url: graphicUrl,
+      file,
     }
 
     setGraphics((current) => ({
@@ -1138,6 +1161,80 @@ function App() {
     }))
 
     event.target.value = ''
+  }
+
+  const handleGraphicBackgroundToggle = (field) => async (event) => {
+    const checked = event.target.checked
+
+    setBackgroundRemoval((current) => ({
+      ...current,
+      [field]: checked,
+    }))
+
+    const sourceGraphic = graphics[field]
+
+    if (!sourceGraphic?.file) {
+      return
+    }
+
+    const graphicUrl = await buildGraphicUrl(sourceGraphic.file, checked)
+
+    setGraphics((current) => ({
+      ...current,
+      [field]: {
+        ...current[field],
+        url: graphicUrl,
+      },
+    }))
+  }
+
+  const handleFrontBackgroundToggle = async (event) => {
+    const checked = event.target.checked
+
+    setBackgroundRemoval((current) => ({
+      ...current,
+      leftBreast: checked,
+      fullFront: checked,
+    }))
+
+    const sourceGraphic = graphics.leftBreast ?? graphics.fullFront
+
+    if (!sourceGraphic?.file) {
+      return
+    }
+
+    const graphicUrl = await buildGraphicUrl(sourceGraphic.file, checked)
+    const sharedGraphic = {
+      ...sourceGraphic,
+      url: graphicUrl,
+    }
+
+    setGraphics((current) => ({
+      ...current,
+      leftBreast: sharedGraphic,
+      fullFront: sharedGraphic,
+    }))
+  }
+
+  const handleGraphicSizeAdjust = (field, direction) => () => {
+    const step = direction === 'increase' ? GRAPHIC_SIZE_STEP : -GRAPHIC_SIZE_STEP
+
+    setGraphicPlacements((current) => {
+      const basePlacement = current[field] ?? GRAPHIC_LAYOUTS[field]
+      const nextWidth = Math.min(
+        GRAPHIC_MAX_WIDTH,
+        Math.max(GRAPHIC_MIN_WIDTH, basePlacement.width + step),
+      )
+
+      return {
+        ...current,
+        [field]: {
+          ...GRAPHIC_LAYOUTS[field],
+          ...basePlacement,
+          width: nextWidth,
+        },
+      }
+    })
   }
 
   const handleGraphicPointerDown = (field) => (event) => {
@@ -1676,6 +1773,36 @@ function App() {
                       onChange={handleFrontGraphicUpload}
                     />
                   </label>
+                  {sharedFrontGraphic ? (
+                    <div className="graphic-size-controls" aria-label="Adjust front graphic size">
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust(activeFrontField, 'decrease')}
+                        aria-label="Make front graphic slightly smaller"
+                      >
+                        -
+                      </button>
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust(activeFrontField, 'increase')}
+                        aria-label="Make front graphic slightly larger"
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : null}
+                  {sharedFrontGraphic ? (
+                    <label className="background-toggle">
+                      <input
+                        type="checkbox"
+                        checked={backgroundRemoval.leftBreast}
+                        onChange={handleFrontBackgroundToggle}
+                      />
+                      <span>Remove background</span>
+                    </label>
+                  ) : null}
                   <small className="upload-meta">{sharedFrontGraphic?.name ?? ''}</small>
                 </div>
               </label>
@@ -1702,6 +1829,36 @@ function App() {
                       onChange={handleGraphicUpload('leftSleeve')}
                     />
                   </label>
+                  {graphics.leftSleeve ? (
+                    <div className="graphic-size-controls" aria-label="Adjust left sleeve graphic size">
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust('leftSleeve', 'decrease')}
+                        aria-label="Make left sleeve graphic slightly smaller"
+                      >
+                        -
+                      </button>
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust('leftSleeve', 'increase')}
+                        aria-label="Make left sleeve graphic slightly larger"
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : null}
+                  {graphics.leftSleeve ? (
+                    <label className="background-toggle">
+                      <input
+                        type="checkbox"
+                        checked={backgroundRemoval.leftSleeve}
+                        onChange={handleGraphicBackgroundToggle('leftSleeve')}
+                      />
+                      <span>Remove background</span>
+                    </label>
+                  ) : null}
                   <small className="upload-meta">{graphics.leftSleeve?.name ?? ''}</small>
                 </div>
               </label>
@@ -1728,6 +1885,36 @@ function App() {
                       onChange={handleGraphicUpload('rightSleeve')}
                     />
                   </label>
+                  {graphics.rightSleeve ? (
+                    <div className="graphic-size-controls" aria-label="Adjust right sleeve graphic size">
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust('rightSleeve', 'decrease')}
+                        aria-label="Make right sleeve graphic slightly smaller"
+                      >
+                        -
+                      </button>
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust('rightSleeve', 'increase')}
+                        aria-label="Make right sleeve graphic slightly larger"
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : null}
+                  {graphics.rightSleeve ? (
+                    <label className="background-toggle">
+                      <input
+                        type="checkbox"
+                        checked={backgroundRemoval.rightSleeve}
+                        onChange={handleGraphicBackgroundToggle('rightSleeve')}
+                      />
+                      <span>Remove background</span>
+                    </label>
+                  ) : null}
                   <small className="upload-meta">{graphics.rightSleeve?.name ?? ''}</small>
                 </div>
               </label>
@@ -1754,6 +1941,36 @@ function App() {
                       onChange={handleGraphicUpload('fullBack')}
                     />
                   </label>
+                  {graphics.fullBack ? (
+                    <div className="graphic-size-controls" aria-label="Adjust back graphic size">
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust('fullBack', 'decrease')}
+                        aria-label="Make back graphic slightly smaller"
+                      >
+                        -
+                      </button>
+                      <button
+                        type="button"
+                        className="size-adjust-button"
+                        onClick={handleGraphicSizeAdjust('fullBack', 'increase')}
+                        aria-label="Make back graphic slightly larger"
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : null}
+                  {graphics.fullBack ? (
+                    <label className="background-toggle">
+                      <input
+                        type="checkbox"
+                        checked={backgroundRemoval.fullBack}
+                        onChange={handleGraphicBackgroundToggle('fullBack')}
+                      />
+                      <span>Remove background</span>
+                    </label>
+                  ) : null}
                   <small className="upload-meta">{graphics.fullBack?.name ?? ''}</small>
                 </div>
               </label>

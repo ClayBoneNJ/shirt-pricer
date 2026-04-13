@@ -282,6 +282,14 @@
     drop-shadow(0 0 18px rgba(255, 255, 255, 0.14));
 }
 
+.shirt-mockup-image-light-grey {
+  filter:
+    brightness(1.14)
+    saturate(0.76)
+    contrast(0.92)
+    drop-shadow(0 14px 24px rgba(0, 0, 0, 0.2));
+}
+
 .graphic-overlay {
   position: absolute;
   display: grid;
@@ -941,6 +949,47 @@
 
 .upload-button input {
   display: none;
+}
+
+.graphic-size-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.size-adjust-button {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: 1px solid rgba(173, 204, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted-strong);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.size-adjust-button:hover {
+  border-color: rgba(126, 224, 200, 0.32);
+  background: rgba(126, 224, 200, 0.12);
+  color: var(--heading);
+}
+
+.background-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-strong);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.background-toggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
 }
 
 .upload-meta {
