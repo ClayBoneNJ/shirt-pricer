@@ -1033,6 +1033,8 @@ function App() {
   const shirtMockupClassName = `shirt-mockup-image${
     form.shirtColor === 'white'
       ? ' shirt-mockup-image-white'
+      : form.shirtColor === 'navy'
+        ? ' shirt-mockup-image-navy'
       : form.shirtColor === 'light-grey'
         ? ' shirt-mockup-image-light-grey'
         : ''

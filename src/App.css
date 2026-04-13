@@ -282,6 +282,15 @@
     drop-shadow(0 0 18px rgba(255, 255, 255, 0.14));
 }
 
+.shirt-mockup-image-navy {
+  filter:
+    brightness(0.52)
+    saturate(0.72)
+    contrast(1.08)
+    hue-rotate(8deg)
+    drop-shadow(0 14px 24px rgba(0, 0, 0, 0.24));
+}
+
 .shirt-mockup-image-light-grey {
   filter:
     brightness(1.14)
