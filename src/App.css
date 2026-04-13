@@ -293,9 +293,9 @@
 
 .shirt-mockup-image-light-grey {
   filter:
-    brightness(1.04)
-    saturate(0.72)
-    contrast(0.95)
+    brightness(0.64)
+    saturate(0.54)
+    contrast(1.02)
     drop-shadow(0 14px 24px rgba(0, 0, 0, 0.2));
 }
 
