@@ -171,6 +171,7 @@ const createDefaultForm = () => ({
   apparelType: DEFAULT_APPAREL,
   shirtColor: 'black',
   quantity: '5',
+  quantityTier: getQuantityTierForQuantity(5)?.value ?? PRICING_CONFIG.quantityBreaks[0].value,
   blankCost: PRICING_CONFIG.blankPrices[DEFAULT_APPAREL].cost.toFixed(2),
   transferPrices: {
     leftBreast: PRICING_CONFIG.transferPrices.leftBreast.cost.toFixed(2),
@@ -955,7 +956,10 @@ function App() {
     const fullFrontCost = clampNumber(form.transferPrices.fullFront)
     const fullBackCost = clampNumber(form.transferPrices.fullBack)
     const sleeveCost = clampNumber(form.transferPrices.sleeve)
-    const quantityTier = getQuantityTierForQuantity(quantity) ?? PRICING_CONFIG.quantityBreaks[0]
+    const quantityTier =
+      PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === form.quantityTier) ??
+      getQuantityTierForQuantity(quantity) ??
+      PRICING_CONFIG.quantityBreaks[0]
     const shirtColor =
       SHIRT_COLORS.find((color) => color.value === form.shirtColor) ?? SHIRT_COLORS[0]
     const garmentImagePrefix = getGarmentImagePrefix(form.apparelType)
@@ -1086,7 +1090,24 @@ function App() {
 
   const handleQuantityChange = (event) => {
     const quantity = sanitizeIntegerInput(event.target.value)
-    setForm((current) => ({ ...current, quantity }))
+    const matchedTier =
+      getQuantityTierForQuantity(Math.max(1, clampNumber(quantity || 0))) ??
+      PRICING_CONFIG.quantityBreaks[0]
+
+    setForm((current) => ({
+      ...current,
+      quantity,
+      quantityTier: matchedTier.value,
+    }))
+  }
+
+  const handleQuantityTierChange = (event) => {
+    const quantityTier = event.target.value
+
+    setForm((current) => ({
+      ...current,
+      quantityTier,
+    }))
   }
 
   const handleShirtColorChange = (shirtColor) => {
@@ -1715,6 +1736,21 @@ function App() {
                 onChange={handleQuantityChange}
                 placeholder="24"
               />
+            </label>
+
+            <label className="field preview-control-field">
+              <span>Quantity tier</span>
+              <select
+                className="spotlight-control garment-select"
+                value={form.quantityTier}
+                onChange={handleQuantityTierChange}
+              >
+                {PRICING_CONFIG.quantityBreaks.map((tier) => (
+                  <option key={tier.value} value={tier.value}>
+                    {tier.label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
 
