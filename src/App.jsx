@@ -117,7 +117,7 @@ const SHIRT_COLORS = [
   {
     value: 'light-grey',
     label: 'Light Grey',
-    hex: '#d6dbe2',
+    hex: '#bcc4ce',
     assetValue: 'heather',
   },
   {
@@ -138,7 +138,7 @@ const SHIRT_COLORS = [
   {
     value: 'royal',
     label: 'Royal',
-    hex: '#1f5fbf',
+    hex: '#1565d8',
   },
   {
     value: 'light-blue',
