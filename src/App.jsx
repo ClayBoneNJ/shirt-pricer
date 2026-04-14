@@ -37,23 +37,24 @@ const formatAppVersion = (version) => {
 
 const APP_VERSION = formatAppVersion(packageJson.version)
 const MINIMUM_EFFECTIVE_MULTIPLIER = 2
+const MULTIPLIER_FLOOR_UNLOCK_TIERS = new Set(['24-47', '48-71', '72+'])
 const PRICING_PRESETS = {
   budget: {
     label: '$',
     multiplierScale: 0.94,
-    minimumUnitPrice: 18,
+    minimumUnitPrice: 25,
     rockBottomUnitPrice: 7,
   },
   standard: {
     label: '$$',
     multiplierScale: 1,
-    minimumUnitPrice: 22,
+    minimumUnitPrice: 25,
     rockBottomUnitPrice: 7.75,
   },
   premium: {
     label: '$$$',
     multiplierScale: 1.08,
-    minimumUnitPrice: 26,
+    minimumUnitPrice: 25,
     rockBottomUnitPrice: 8.75,
   },
 }
@@ -1003,10 +1004,10 @@ function App() {
       (form.printLocations.leftSleeve ? sleeveCost : 0) +
       (form.printLocations.rightSleeve ? sleeveCost : 0)
     const unitCost = blankCost + decorationCost
-    const effectiveMultiplier = Math.max(
-      MINIMUM_EFFECTIVE_MULTIPLIER,
-      quantityTier.multiplier * pricingPreset.multiplierScale,
-    )
+    const scaledMultiplier = quantityTier.multiplier * pricingPreset.multiplierScale
+    const effectiveMultiplier = MULTIPLIER_FLOOR_UNLOCK_TIERS.has(quantityTier.value)
+      ? scaledMultiplier
+      : Math.max(MINIMUM_EFFECTIVE_MULTIPLIER, scaledMultiplier)
     const unitPriceFromMultiplier =
       unitCost * effectiveMultiplier
     const minimumUnitPrice = getMinimumUnitPrice(
