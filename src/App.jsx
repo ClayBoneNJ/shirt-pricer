@@ -11,12 +11,12 @@ const PRICING_CONFIG = {
     hoodie: { label: 'Hoodie', cost: 13.59 },
   },
   quantityBreaks: [
-    { value: '1-5', label: '1-5 pieces', multiplier: 2.22 },
-    { value: '6-11', label: '6-11 pieces', multiplier: 2.22 },
-    { value: '12-23', label: '12-23 pieces', multiplier: 2 },
-    { value: '24-47', label: '24-47 pieces', multiplier: 1.77 },
-    { value: '48-71', label: '48-71 pieces', multiplier: 1.64 },
-    { value: '72+', label: '72+ pieces', multiplier: 1.51 },
+    { value: '1-5', label: '1-5 pieces', multiplier: 2.1 },
+    { value: '6-11', label: '6-11 pieces', multiplier: 2.1 },
+    { value: '12-23', label: '12-23 pieces', multiplier: 1.9 },
+    { value: '24-47', label: '24-47 pieces', multiplier: 1.7 },
+    { value: '48-71', label: '48-71 pieces', multiplier: 1.58 },
+    { value: '72+', label: '72+ pieces', multiplier: 1.46 },
   ],
   transferPrices: {
     leftBreast: { label: 'Left Breast', cost: 1.5 },
@@ -27,7 +27,7 @@ const PRICING_CONFIG = {
 }
 
 const DEFAULT_APPAREL = 'standard'
-const ROCK_BOTTOM_UNIT_PRICE = 8.5
+const ROCK_BOTTOM_UNIT_PRICE = 7.75
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const formatAppVersion = (version) => {
   const versionParts = version.split('.').map((part) => Number.parseInt(part, 10) || 0)
@@ -447,7 +447,7 @@ const getMinimumUnitPrice = (printLocations, quantityTierValue) => {
     return 0
   }
 
-  let minimumUnitPrice = 25
+  let minimumUnitPrice = 22
 
   const selectedLocations = Object.entries(printLocations)
     .filter(([, isSelected]) => isSelected)
