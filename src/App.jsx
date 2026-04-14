@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import packageJson from '../package.json'
+import { toJpeg } from 'html-to-image'
 
 const PRICING_CONFIG = {
   blankPrices: {
@@ -1350,219 +1351,18 @@ function App() {
   }, [isColorMenuOpen])
 
   const buildQuoteMockJpgBlob = async () => {
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
-
-    if (!context) {
+    if (!quoteMockRef.current) {
       return null
     }
-
-    const exportWidth = 1800
-    const exportHeight = 1320
-    canvas.width = exportWidth
-    canvas.height = exportHeight
-
-    const graphicImages = Object.fromEntries(
-      await Promise.all(
-        Object.entries(graphics).map(async ([field, graphic]) => [
-          field,
-          graphic?.url ? await loadImageFromSrc(graphic.url) : null,
-        ]),
-      ),
-    )
-
-    const [
-      backgroundImage,
-      companyLogoImage,
-      shirtFrontImage,
-      shirtBackImage,
-      logoWatermarkImage,
-      frontWatermarkImage,
-      backWatermarkImage,
-    ] = await Promise.all([
-      loadImageFromSrc(quoteBackgroundSrc),
-      loadImageFromSrc(`${ASSET_BASE_URL}company-logo.png`),
-      loadImageFromSrc(selection.shirtColor.frontImage),
-      loadImageFromSrc(selection.shirtColor.backImage),
-      loadImageFromSrc(`${ASSET_BASE_URL}company-logo.png`),
-      mockFrontGraphic ? loadImageFromSrc(mockFrontGraphic.url) : Promise.resolve(null),
-      mockBackGraphic ? loadImageFromSrc(mockBackGraphic.url) : Promise.resolve(null),
-    ])
-
-    const shirtFrontBounds = getOpaqueImageBounds(shirtFrontImage)
-    const shirtBackBounds = getOpaqueImageBounds(shirtBackImage)
-
-    context.fillStyle = '#111827'
-    context.fillRect(0, 0, exportWidth, exportHeight)
-
-    drawRoundedRect(context, 0, 0, exportWidth, exportHeight, 44)
-    context.save()
-    context.clip()
-    const adjustedBackgroundImage = getAdjustedBackgroundCanvas(backgroundImage, exportWidth, exportHeight, {
-      hueRotation: quoteHueRotation,
-      saturation: 1.35,
-      brightness: 0.72,
-      contrast: 1.08,
-    })
-    context.drawImage(adjustedBackgroundImage, 0, 0, exportWidth, exportHeight)
-    context.fillStyle = 'rgba(8, 14, 22, 0.54)'
-    context.fillRect(0, 0, exportWidth, exportHeight)
-
-    context.globalAlpha = 0.14
-    drawContainedImage(context, logoWatermarkImage, -120, exportHeight - 480, 760, 520, -8)
-    context.globalAlpha = 0.32
-    if (frontWatermarkImage) {
-      drawContainedImage(context, frontWatermarkImage, exportWidth - 760, -120, 1040, 620, 14)
-    }
-    context.globalAlpha = 0.24
-    if (backWatermarkImage) {
-      drawContainedImage(
-        context,
-        backWatermarkImage,
-        exportWidth - 560,
-        exportHeight - 370,
-        760,
-        460,
-        14,
-      )
-    }
-    context.globalAlpha = 1
-
-    context.drawImage(companyLogoImage, 70, 70, 240, 240)
-
-    context.fillStyle = '#f8fafc'
-    context.font = '700 64px Arial'
-    context.textBaseline = 'top'
-    context.fillText(quoteHeaderName, 328, 90)
-
-    context.fillStyle = 'rgba(226, 232, 240, 0.88)'
-    context.font = '500 30px Arial'
-    context.fillText(selection.garmentLabel, 328, 172)
-    context.fillText(`${selection.quantity} pieces`, 328, 214)
-    context.fillText(quotePlacementSummary, 328, 256)
-
-    const frontStage = { x: 90, y: 300, width: 860, height: 760, rotation: -5 }
-    const backStage = { x: 850, y: 300, width: 860, height: 760, rotation: 5 }
-
-    drawContainedImage(
-      context,
-      shirtFrontImage,
-      frontStage.x,
-      frontStage.y,
-      frontStage.width,
-      frontStage.height,
-      frontStage.rotation,
-      shirtFrontBounds,
-    )
-    drawContainedImage(
-      context,
-      shirtBackImage,
-      backStage.x,
-      backStage.y,
-      backStage.width,
-      backStage.height,
-      backStage.rotation,
-      shirtBackBounds,
-    )
-
-    const drawPlacedGraphic = (image, view, field) => {
-      if (!image) {
-        return
-      }
-
-      const placement = graphicPlacements[field] ?? GRAPHIC_LAYOUTS[field]
-      const stage = view === 'front' ? frontStage : backStage
-      const width = stage.width * (placement.width / 100)
-      const x = stage.x + stage.width * (placement.x / 100)
-      const y = stage.y + stage.height * (placement.y / 100)
-
-      drawOverlayImage(context, image, x, y, width, placement.rotation + stage.rotation)
-    }
-
-    Object.entries(GRAPHIC_LAYOUTS).forEach(([field, config]) => {
-      if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
-        return
-      }
-
-      drawPlacedGraphic(graphicImages[field], 'front', field)
+    const dataUrl = await toJpeg(quoteMockRef.current, {
+      backgroundColor: '#111827',
+      cacheBust: true,
+      pixelRatio: 2,
+      quality: 0.95,
     })
 
-    Object.entries(GRAPHIC_LAYOUTS).forEach(([field, config]) => {
-      if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
-        return
-      }
-
-      drawPlacedGraphic(graphicImages[field], 'back', field)
-    })
-
-    context.fillStyle = 'rgba(226, 232, 240, 0.82)'
-    context.font = '700 24px Arial'
-    context.textAlign = 'center'
-    context.fillText('Front', 520, 1088)
-    context.fillText('Back', 1280, 1088)
-
-    const infoPillY = exportHeight - 228
-    const infoPillHeight = 156
-
-    drawRoundedRect(context, 70, infoPillY, exportWidth - 140, infoPillHeight, 28)
-    context.fillStyle = 'rgba(255, 255, 255, 0.96)'
-    context.fill()
-
-    const infoColumns = [
-      { label: 'GARMENT', value: selection.garmentLabel, note: selection.garmentNote, x: 120, width: 430 },
-      { label: 'PRICE PER GARMENT', value: formatMoney(selection.unitPrice), x: 610, width: 290 },
-      { label: 'QUANTITY', value: String(selection.quantity), x: 980, width: 210 },
-      { label: 'TOTAL PRICE', value: formatMoney(selection.customerPrice), x: 1290, width: 360 },
-    ]
-
-    infoColumns.forEach((item) => {
-      const hasNote = Boolean(item.note)
-      const valueY = hasNote ? infoPillY + 64 : infoPillY + 86
-      const noteY = hasNote ? infoPillY + 116 : infoPillY + 118
-
-      context.textAlign = 'left'
-      context.fillStyle = 'rgba(55, 65, 81, 0.72)'
-      context.font = '700 18px Arial'
-      context.fillText(item.label, item.x, infoPillY + 34)
-      context.fillStyle = '#111827'
-      context.font = '700 44px Arial'
-      context.fillText(item.value, item.x, valueY)
-
-      if (hasNote) {
-        context.fillStyle = 'rgba(55, 65, 81, 0.8)'
-        context.font = '400 16px Arial'
-        const noteLines = []
-        const words = item.note.split(' ')
-        let currentLine = ''
-
-        words.forEach((word) => {
-          const candidate = currentLine ? `${currentLine} ${word}` : word
-
-          if (context.measureText(candidate).width <= item.width) {
-            currentLine = candidate
-            return
-          }
-
-          if (currentLine) {
-            noteLines.push(currentLine)
-          }
-
-          currentLine = word
-        })
-
-        if (currentLine) {
-          noteLines.push(currentLine)
-        }
-
-        noteLines.slice(0, 2).forEach((line, index) => {
-          context.fillText(line, item.x, noteY + index * 18)
-        })
-      }
-    })
-
-    context.restore()
-
-    return canvasToBlob(canvas, 'image/jpeg', 0.95)
+    const response = await fetch(dataUrl)
+    return response.blob()
   }
 
   const downloadQuoteMockJpg = (blob) => {
