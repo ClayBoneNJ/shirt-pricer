@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import packageJson from '../package.json'
-import { toJpeg } from 'html-to-image'
+import { toBlob } from 'html-to-image'
 
 const PRICING_CONFIG = {
   blankPrices: {
@@ -1354,15 +1354,14 @@ function App() {
     if (!quoteMockRef.current) {
       return null
     }
-    const dataUrl = await toJpeg(quoteMockRef.current, {
+
+    return toBlob(quoteMockRef.current, {
       backgroundColor: '#111827',
       cacheBust: true,
       pixelRatio: 2,
       quality: 0.95,
+      type: 'image/jpeg',
     })
-
-    const response = await fetch(dataUrl)
-    return response.blob()
   }
 
   const downloadQuoteMockJpg = (blob) => {
@@ -1392,6 +1391,8 @@ function App() {
       if (blob) {
         downloadQuoteMockJpg(blob)
       }
+    } catch (error) {
+      console.error('Unable to build quote mock JPG.', error)
     } finally {
       setIsQuoteMockExporting(false)
     }
