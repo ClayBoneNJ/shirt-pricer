@@ -38,24 +38,22 @@ const formatAppVersion = (version) => {
 const APP_VERSION = formatAppVersion(packageJson.version)
 const MINIMUM_EFFECTIVE_MULTIPLIER = 2
 const MULTIPLIER_FLOOR_UNLOCK_TIERS = new Set(['24-47', '48-71', '72+'])
+const ABSOLUTE_MINIMUM_UNIT_PRICE = 8.75
 const PRICING_PRESETS = {
   budget: {
     label: '$',
     multiplierScale: 0.94,
     minimumUnitPrice: 25,
-    rockBottomUnitPrice: 7,
   },
   standard: {
     label: '$$',
     multiplierScale: 1,
     minimumUnitPrice: 25,
-    rockBottomUnitPrice: 7.75,
   },
   premium: {
     label: '$$$',
     multiplierScale: 1.08,
     minimumUnitPrice: 25,
-    rockBottomUnitPrice: 8.75,
   },
 }
 
@@ -1018,7 +1016,7 @@ function App() {
     const unitPrice = Math.max(
       unitPriceFromMultiplier,
       minimumUnitPrice,
-      pricingPreset.rockBottomUnitPrice,
+      ABSOLUTE_MINIMUM_UNIT_PRICE,
     )
     const customerPrice = unitPrice * quantity
     const totalCost = unitCost * quantity
