@@ -925,13 +925,13 @@ const buildGraphicUrl = async (file, shouldRemoveBackground) => {
     /\.(jpe?g|png|webp)$/i.test(file.name)
 
   if (!shouldRemoveBackground || !isRasterUpload) {
-    return URL.createObjectURL(file)
+    return readFileAsDataUrl(file)
   }
 
   try {
     return await removeBackgroundFromRaster(file)
   } catch {
-    return URL.createObjectURL(file)
+    return readFileAsDataUrl(file)
   }
 }
 
