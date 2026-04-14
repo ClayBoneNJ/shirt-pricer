@@ -558,6 +558,43 @@
   gap: 10px;
 }
 
+.pricing-preset-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid rgba(173, 204, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pricing-preset-button {
+  min-width: 48px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted-strong);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.pricing-preset-button:hover {
+  transform: translateY(-1px);
+  color: var(--heading);
+}
+
+.pricing-preset-button.active {
+  background:
+    linear-gradient(135deg, rgba(126, 224, 200, 0.16), rgba(137, 168, 255, 0.12)),
+    rgba(19, 36, 61, 0.92);
+  color: var(--heading);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.16);
+}
+
 .quote-background-field {
   min-width: min(240px, 100%);
 }

@@ -27,7 +27,6 @@ const PRICING_CONFIG = {
 }
 
 const DEFAULT_APPAREL = 'standard'
-const ROCK_BOTTOM_UNIT_PRICE = 7.75
 const ASSET_BASE_URL = import.meta.env.BASE_URL
 const formatAppVersion = (version) => {
   const versionParts = version.split('.').map((part) => Number.parseInt(part, 10) || 0)
@@ -37,6 +36,26 @@ const formatAppVersion = (version) => {
 }
 
 const APP_VERSION = formatAppVersion(packageJson.version)
+const PRICING_PRESETS = {
+  budget: {
+    label: '$',
+    multiplierScale: 0.94,
+    minimumUnitPrice: 18,
+    rockBottomUnitPrice: 7,
+  },
+  standard: {
+    label: '$$',
+    multiplierScale: 1,
+    minimumUnitPrice: 22,
+    rockBottomUnitPrice: 7.75,
+  },
+  premium: {
+    label: '$$$',
+    multiplierScale: 1.08,
+    minimumUnitPrice: 26,
+    rockBottomUnitPrice: 8.75,
+  },
+}
 
 const QUOTE_BACKGROUNDS = [
   {
@@ -442,12 +461,12 @@ const formatMoney = (value) =>
     currency: 'USD',
   }).format(Number.isFinite(value) ? value : 0)
 
-const getMinimumUnitPrice = (printLocations, quantityTierValue) => {
+const getMinimumUnitPrice = (printLocations, quantityTierValue, pricingPreset) => {
   if (quantityTierValue !== '1-5') {
     return 0
   }
 
-  let minimumUnitPrice = 22
+  let minimumUnitPrice = pricingPreset.minimumUnitPrice
 
   const selectedLocations = Object.entries(printLocations)
     .filter(([, isSelected]) => isSelected)
@@ -947,6 +966,7 @@ function App() {
   const [quoteAccentColor, setQuoteAccentColor] = useState(hexToRgb(SHIRT_COLORS[1].hex))
   const [isQuoteMockExporting, setIsQuoteMockExporting] = useState(false)
   const [quoteBackground, setQuoteBackground] = useState(QUOTE_BACKGROUNDS[0].value)
+  const [pricingPresetKey, setPricingPresetKey] = useState('standard')
   const quoteMockRef = useRef(null)
   const colorPickerRef = useRef(null)
 
@@ -961,6 +981,7 @@ function App() {
       PRICING_CONFIG.quantityBreaks.find((tier) => tier.value === form.quantityTier) ??
       getQuantityTierForQuantity(quantity) ??
       PRICING_CONFIG.quantityBreaks[0]
+    const pricingPreset = PRICING_PRESETS[pricingPresetKey] ?? PRICING_PRESETS.standard
     const shirtColor =
       SHIRT_COLORS.find((color) => color.value === form.shirtColor) ?? SHIRT_COLORS[0]
     const garmentImagePrefix = getGarmentImagePrefix(form.apparelType)
@@ -981,15 +1002,17 @@ function App() {
       (form.printLocations.leftSleeve ? sleeveCost : 0) +
       (form.printLocations.rightSleeve ? sleeveCost : 0)
     const unitCost = blankCost + decorationCost
-    const unitPriceFromMultiplier = unitCost * quantityTier.multiplier
+    const unitPriceFromMultiplier =
+      unitCost * quantityTier.multiplier * pricingPreset.multiplierScale
     const minimumUnitPrice = getMinimumUnitPrice(
       form.printLocations,
       quantityTier.value,
+      pricingPreset,
     )
     const unitPrice = Math.max(
       unitPriceFromMultiplier,
       minimumUnitPrice,
-      ROCK_BOTTOM_UNIT_PRICE,
+      pricingPreset.rockBottomUnitPrice,
     )
     const customerPrice = unitPrice * quantity
     const totalCost = unitCost * quantity
@@ -1004,6 +1027,7 @@ function App() {
         backImage: `${ASSET_BASE_URL}shirts/${garmentImagePrefix}${garmentAssetValue}-back.png`,
       },
       quantityTier,
+      pricingPreset,
       quantity,
       blankCost,
       leftBreastCost,
@@ -1019,7 +1043,7 @@ function App() {
       totalCost,
       profit,
     }
-  }, [form])
+  }, [form, pricingPresetKey])
 
   const sharedFrontGraphic = graphics.leftBreast ?? graphics.fullFront
   const activeFrontField = form.printLocations.leftBreast ? 'leftBreast' : 'fullFront'
@@ -1910,6 +1934,21 @@ function App() {
               <span className="mini-label">Pricing snapshot</span>
             </div>
             <div className="quote-mock-actions">
+              <div className="pricing-preset-group" aria-label="Pricing aggressiveness">
+                {Object.entries(PRICING_PRESETS).map(([key, preset]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`pricing-preset-button ${
+                      pricingPresetKey === key ? 'active' : ''
+                    }`}
+                    onClick={() => setPricingPresetKey(key)}
+                    aria-pressed={pricingPresetKey === key}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
               <label className="field quote-background-field">
                 <span>Mock background</span>
                 <select
