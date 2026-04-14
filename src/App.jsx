@@ -1002,8 +1002,9 @@ function App() {
       (form.printLocations.leftSleeve ? sleeveCost : 0) +
       (form.printLocations.rightSleeve ? sleeveCost : 0)
     const unitCost = blankCost + decorationCost
+    const effectiveMultiplier = quantityTier.multiplier * pricingPreset.multiplierScale
     const unitPriceFromMultiplier =
-      unitCost * quantityTier.multiplier * pricingPreset.multiplierScale
+      unitCost * effectiveMultiplier
     const minimumUnitPrice = getMinimumUnitPrice(
       form.printLocations,
       quantityTier.value,
@@ -1028,6 +1029,7 @@ function App() {
       },
       quantityTier,
       pricingPreset,
+      effectiveMultiplier,
       quantity,
       blankCost,
       leftBreastCost,
@@ -2007,7 +2009,7 @@ function App() {
             </div>
             <div>
               <p className="mini-label">Multiplier</p>
-              <strong>{selection.quantityTier.multiplier.toFixed(2)}x</strong>
+              <strong>{selection.effectiveMultiplier.toFixed(2)}x</strong>
             </div>
             <div>
               <p className="mini-label">Suggested sale price</p>
