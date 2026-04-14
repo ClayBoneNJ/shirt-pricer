@@ -36,6 +36,7 @@ const formatAppVersion = (version) => {
 }
 
 const APP_VERSION = formatAppVersion(packageJson.version)
+const MINIMUM_EFFECTIVE_MULTIPLIER = 2
 const PRICING_PRESETS = {
   budget: {
     label: '$',
@@ -1002,7 +1003,10 @@ function App() {
       (form.printLocations.leftSleeve ? sleeveCost : 0) +
       (form.printLocations.rightSleeve ? sleeveCost : 0)
     const unitCost = blankCost + decorationCost
-    const effectiveMultiplier = quantityTier.multiplier * pricingPreset.multiplierScale
+    const effectiveMultiplier = Math.max(
+      MINIMUM_EFFECTIVE_MULTIPLIER,
+      quantityTier.multiplier * pricingPreset.multiplierScale,
+    )
     const unitPriceFromMultiplier =
       unitCost * effectiveMultiplier
     const minimumUnitPrice = getMinimumUnitPrice(
