@@ -2031,156 +2031,158 @@ function App() {
 
         {isQuoteMockVisible ? (
           <section className="glass-panel focus-panel quote-mock-panel">
-            <div
-              ref={quoteMockRef}
-              className="quote-mock-sheet"
-              style={{
-                '--quote-accent': quoteAccentCss,
-                '--quote-base': quoteBaseCss,
-                '--quote-hue': `${quoteHueRotation}deg`,
-              }}
-            >
-              <img
-                src={quoteBackgroundSrc}
-                alt=""
-                aria-hidden="true"
-                className="quote-mock-background"
-              />
-              <div className="quote-mock-watermarks" aria-hidden="true">
+            <div className="quote-mock-stage">
+              <div
+                ref={quoteMockRef}
+                className="quote-mock-sheet"
+                style={{
+                  '--quote-accent': quoteAccentCss,
+                  '--quote-base': quoteBaseCss,
+                  '--quote-hue': `${quoteHueRotation}deg`,
+                }}
+              >
                 <img
-                  src={`${ASSET_BASE_URL}company-logo.png`}
+                  src={quoteBackgroundSrc}
                   alt=""
-                  className="quote-mock-watermark quote-mock-watermark-logo"
+                  aria-hidden="true"
+                  className="quote-mock-background"
                 />
-                {mockFrontGraphic ? (
+                <div className="quote-mock-watermarks" aria-hidden="true">
                   <img
-                    src={mockFrontGraphic.url}
+                    src={`${ASSET_BASE_URL}company-logo.png`}
                     alt=""
-                    className="quote-mock-watermark quote-mock-watermark-front"
+                    className="quote-mock-watermark quote-mock-watermark-logo"
                   />
-                ) : null}
-                {mockBackGraphic ? (
-                  <img
-                    src={mockBackGraphic.url}
-                    alt=""
-                    className="quote-mock-watermark quote-mock-watermark-back"
-                  />
-                ) : null}
-              </div>
+                  {mockFrontGraphic ? (
+                    <img
+                      src={mockFrontGraphic.url}
+                      alt=""
+                      className="quote-mock-watermark quote-mock-watermark-front"
+                    />
+                  ) : null}
+                  {mockBackGraphic ? (
+                    <img
+                      src={mockBackGraphic.url}
+                      alt=""
+                      className="quote-mock-watermark quote-mock-watermark-back"
+                    />
+                  ) : null}
+                </div>
 
-              <div className="quote-mock-header">
-                <img
-                  src={`${ASSET_BASE_URL}company-logo.png`}
-                  alt="CJC Custom Apparel logo"
-                  className="quote-mock-logo"
-                />
-                <div className="quote-mock-title-block">
-                  <h2>{quoteHeaderName}</h2>
-                  <div className="quote-mock-title-meta">
-                    <p>{selection.garmentLabel}</p>
-                    <p>{selection.quantity} pieces</p>
-                    <p>{quotePlacementSummary}</p>
+                <div className="quote-mock-header">
+                  <img
+                    src={`${ASSET_BASE_URL}company-logo.png`}
+                    alt="CJC Custom Apparel logo"
+                    className="quote-mock-logo"
+                  />
+                  <div className="quote-mock-title-block">
+                    <h2>{quoteHeaderName}</h2>
+                    <div className="quote-mock-title-meta">
+                      <p>{selection.garmentLabel}</p>
+                      <p>{selection.quantity} pieces</p>
+                      <p>{quotePlacementSummary}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="quote-mock-body">
-                <div className="quote-mock-garments">
-                  <figure className="quote-mock-card">
-                    <div className="quote-mock-canvas">
-                      <img
-                        src={selection.shirtColor.frontImage}
-                        alt={`${selection.shirtColor.label} ${selection.garmentLabel} front`}
-                        className={shirtMockupClassName}
-                      />
-                      {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
-                        if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
-                          return null
-                        }
+                <div className="quote-mock-body">
+                  <div className="quote-mock-garments">
+                    <figure className="quote-mock-card">
+                      <div className="quote-mock-canvas">
+                        <img
+                          src={selection.shirtColor.frontImage}
+                          alt={`${selection.shirtColor.label} ${selection.garmentLabel} front`}
+                          className={shirtMockupClassName}
+                        />
+                        {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
+                          if (config.view !== 'front' || !form.printLocations[field] || !graphics[field]) {
+                            return null
+                          }
 
-                        const placement = graphicPlacements[field] ?? config
+                          const placement = graphicPlacements[field] ?? config
 
-                        return (
-                          <div
-                            key={`quote-front-${field}`}
-                            className="graphic-overlay quote-mock-overlay"
-                            style={{
-                              left: `${placement.x}%`,
-                              top: `${placement.y}%`,
-                              width: `${placement.width}%`,
-                              transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
-                            }}
-                          >
-                            <img
-                              src={graphics[field].url}
-                              alt={graphics[field].name}
-                              className="graphic-overlay-image"
-                              draggable="false"
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <figcaption>Front</figcaption>
-                  </figure>
+                          return (
+                            <div
+                              key={`quote-front-${field}`}
+                              className="graphic-overlay quote-mock-overlay"
+                              style={{
+                                left: `${placement.x}%`,
+                                top: `${placement.y}%`,
+                                width: `${placement.width}%`,
+                                transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
+                              }}
+                            >
+                              <img
+                                src={graphics[field].url}
+                                alt={graphics[field].name}
+                                className="graphic-overlay-image"
+                                draggable="false"
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <figcaption>Front</figcaption>
+                    </figure>
 
-                  <figure className="quote-mock-card">
-                    <div className="quote-mock-canvas">
-                      <img
-                        src={selection.shirtColor.backImage}
-                        alt={`${selection.shirtColor.label} ${selection.garmentLabel} back`}
-                        className={shirtMockupClassName}
-                      />
-                      {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
-                        if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
-                          return null
-                        }
+                    <figure className="quote-mock-card">
+                      <div className="quote-mock-canvas">
+                        <img
+                          src={selection.shirtColor.backImage}
+                          alt={`${selection.shirtColor.label} ${selection.garmentLabel} back`}
+                          className={shirtMockupClassName}
+                        />
+                        {Object.entries(GRAPHIC_LAYOUTS).map(([field, config]) => {
+                          if (config.view !== 'back' || !form.printLocations[field] || !graphics[field]) {
+                            return null
+                          }
 
-                        const placement = graphicPlacements[field] ?? config
+                          const placement = graphicPlacements[field] ?? config
 
-                        return (
-                          <div
-                            key={`quote-back-${field}`}
-                            className="graphic-overlay quote-mock-overlay"
-                            style={{
-                              left: `${placement.x}%`,
-                              top: `${placement.y}%`,
-                              width: `${placement.width}%`,
-                              transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
-                            }}
-                          >
-                            <img
-                              src={graphics[field].url}
-                              alt={graphics[field].name}
-                              className="graphic-overlay-image"
-                              draggable="false"
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <figcaption>Back</figcaption>
-                  </figure>
+                          return (
+                            <div
+                              key={`quote-back-${field}`}
+                              className="graphic-overlay quote-mock-overlay"
+                              style={{
+                                left: `${placement.x}%`,
+                                top: `${placement.y}%`,
+                                width: `${placement.width}%`,
+                                transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
+                              }}
+                            >
+                              <img
+                                src={graphics[field].url}
+                                alt={graphics[field].name}
+                                className="graphic-overlay-image"
+                                draggable="false"
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <figcaption>Back</figcaption>
+                    </figure>
+                  </div>
                 </div>
-              </div>
 
-              <div className="quote-mock-info-bar">
-                <div className="quote-mock-info-item quote-mock-footer-type">
-                  <span className="mini-label">Garment</span>
-                  <strong>{selection.garmentLabel}</strong>
-                  <p>{selection.garmentNote}</p>
-                </div>
-                <div className="quote-mock-info-item">
-                  <span className="mini-label">Price per garment</span>
-                  <strong>{formatMoney(selection.unitPrice)}</strong>
-                </div>
-                <div className="quote-mock-info-item">
-                  <span className="mini-label">Quantity</span>
-                  <strong>{selection.quantity}</strong>
-                </div>
-                <div className="quote-mock-info-item">
-                  <span className="mini-label">Total price</span>
-                  <strong>{formatMoney(selection.customerPrice)}</strong>
+                <div className="quote-mock-info-bar">
+                  <div className="quote-mock-info-item quote-mock-footer-type">
+                    <span className="mini-label">Garment</span>
+                    <strong>{selection.garmentLabel}</strong>
+                    <p>{selection.garmentNote}</p>
+                  </div>
+                  <div className="quote-mock-info-item">
+                    <span className="mini-label">Price per garment</span>
+                    <strong>{formatMoney(selection.unitPrice)}</strong>
+                  </div>
+                  <div className="quote-mock-info-item">
+                    <span className="mini-label">Quantity</span>
+                    <strong>{selection.quantity}</strong>
+                  </div>
+                  <div className="quote-mock-info-item">
+                    <span className="mini-label">Total price</span>
+                    <strong>{formatMoney(selection.customerPrice)}</strong>
+                  </div>
                 </div>
               </div>
             </div>
