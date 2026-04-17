@@ -1416,7 +1416,6 @@ function App() {
 
     const pillFont = '700 14px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
     const labelFont = '900 15px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
-    const bodyFont = '500 18px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
     const miniLabelFont = '700 13px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
 
     const drawPill = (x, y, text) => {
@@ -1597,15 +1596,15 @@ function App() {
 
       if (frontWatermarkImage) {
         context.save()
-        context.globalAlpha = 0.3
-        drawContainedImage(context, frontWatermarkImage, 740, 50, 400, 280, 14)
+        context.globalAlpha = 0.34
+        drawContainedImage(context, frontWatermarkImage, 700, 28, 500, 360, 14)
         context.restore()
       }
 
       if (backWatermarkImage) {
         context.save()
-        context.globalAlpha = 0.2
-        drawContainedImage(context, backWatermarkImage, 835, 510, 290, 230, 14)
+        context.globalAlpha = 0.24
+        drawContainedImage(context, backWatermarkImage, 812, 470, 390, 310, 14)
         context.restore()
       }
 
@@ -1667,7 +1666,7 @@ function App() {
       drawCaptionPill(344, 575, 'FRONT')
       drawCaptionPill(847, 575, 'BACK')
 
-      drawSoftPanel(20, 672, 1140, 128, 28, 'rgba(255, 255, 255, 0.96)', 20)
+      drawSoftPanel(20, 660, 1140, 140, 28, 'rgba(255, 255, 255, 0.96)', 20)
 
       const infoColumns = [
         { x: 40, label: 'GARMENT', value: selection.garmentLabel, note: selection.garmentNote, width: 320 },
@@ -1681,14 +1680,14 @@ function App() {
         context.textBaseline = 'top'
         context.fillStyle = 'rgba(17, 24, 39, 0.7)'
         context.font = miniLabelFont
-        context.fillText(label, x, 694)
+        context.fillText(label, x, 682)
         context.fillStyle = '#111827'
         context.font = '700 28px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
-        context.fillText(value, x, 728)
+        context.fillText(value, x, 718)
         if (note) {
           context.fillStyle = 'rgba(17, 24, 39, 0.8)'
-          context.font = bodyFont
-          drawWrappedText(note, x, 767, width, 22)
+          context.font = '500 16px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+          drawWrappedText(note, x, 756, width, 20, 3)
         }
         context.restore()
       })
