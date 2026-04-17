@@ -1520,7 +1520,121 @@
     grid-template-columns: 1fr;
   }
 
-  .shirt-mockup-image {
-    max-height: none;
-  }
+.shirt-mockup-image {
+  max-height: none;
+}
+}
+
+.quote-mock-sheet.quote-mock-export {
+  width: 1180px !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  gap: 0 !important;
+  padding: 6px 18px 10px !important;
+  border-radius: 28px !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-header {
+  display: grid !important;
+  grid-template-columns: auto 1fr !important;
+  gap: 14px !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  text-align: left !important;
+  width: fit-content !important;
+  max-width: min(100%, 560px) !important;
+  margin-top: 28px !important;
+  margin-left: 8px !important;
+  padding: 2px 18px 2px 4px !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-logo {
+  width: 148px !important;
+  margin: -34px -6px -36px 0 !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-title-block {
+  gap: 2px !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-title-block h2 {
+  font-size: clamp(1.35rem, 2.2vw, 2.1rem) !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-title-meta {
+  justify-content: flex-start !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-title-block p {
+  font-size: 0.72rem !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-body {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+  align-items: start !important;
+  margin-top: -22px !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-garments {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  align-items: end !important;
+  justify-items: center !important;
+  margin-top: -2px !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-card {
+  gap: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-card:first-child {
+  transform: rotate(-5deg) translateX(62px) !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-card:last-child {
+  transform: rotate(5deg) translateX(-62px) !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-canvas {
+  width: min(100%, 560px) !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-card figcaption {
+  bottom: 178px !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-info-bar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  padding: 12px 16px !important;
+  margin-top: -42px !important;
+  border-radius: 28px !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-info-bar strong {
+  font-size: 1.45rem !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-watermark-front {
+  top: -4% !important;
+  right: -1% !important;
+  width: min(46vw, 520px) !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-watermark-back {
+  right: 3% !important;
+  bottom: 9% !important;
+  width: min(38vw, 380px) !important;
+}
+
+.quote-mock-sheet.quote-mock-export .quote-mock-watermark-logo {
+  left: -4% !important;
+  bottom: -8% !important;
+  width: min(44vw, 460px) !important;
 }
