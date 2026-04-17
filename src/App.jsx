@@ -38,6 +38,8 @@ const formatAppVersion = (version) => {
 const APP_VERSION = formatAppVersion(packageJson.version)
 const MINIMUM_EFFECTIVE_MULTIPLIER = 2
 const MULTIPLIER_FLOOR_UNLOCK_TIERS = new Set(['24-47', '48-71', '72+'])
+const QUOTE_EXPORT_WIDTH = 1180
+const QUOTE_EXPORT_MIN_HEIGHT = 820
 const ABSOLUTE_MINIMUM_UNIT_PRICE = 8.75
 const PRICING_PRESETS = {
   budget: {
@@ -1384,12 +1386,28 @@ function App() {
       return null
     }
 
-    return toBlob(quoteMockRef.current, {
+    const exportNode = quoteMockRef.current
+    const exportHeight = Math.max(
+      QUOTE_EXPORT_MIN_HEIGHT,
+      Math.round((exportNode.scrollHeight / Math.max(exportNode.clientWidth, 1)) * QUOTE_EXPORT_WIDTH),
+    )
+
+    return toBlob(exportNode, {
       backgroundColor: '#111827',
       cacheBust: true,
+      canvasWidth: QUOTE_EXPORT_WIDTH,
+      canvasHeight: exportHeight,
       pixelRatio: 2,
       quality: 0.95,
       type: 'image/jpeg',
+      width: QUOTE_EXPORT_WIDTH,
+      height: exportHeight,
+      windowWidth: QUOTE_EXPORT_WIDTH,
+      windowHeight: exportHeight,
+      style: {
+        width: `${QUOTE_EXPORT_WIDTH}px`,
+        maxWidth: 'none',
+      },
     })
   }
 
