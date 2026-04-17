@@ -4,10 +4,10 @@ import packageJson from '../package.json'
 
 const PRICING_CONFIG = {
   blankPrices: {
-    standard: { label: 'Standard T-Shirt', cost: 3.53 },
-    soft: { label: 'Soft T-Shirt', cost: 4.39 },
-    polo: { label: 'Polo', cost: 8.73 },
-    hoodie: { label: 'Hoodie', cost: 13.59 },
+    standard: { label: 'Standard Gildan 500 T-Shirts', cost: 3.53 },
+    soft: { label: 'Upgraded Gildan Softstyle 640', cost: 4.39 },
+    polo: { label: 'Basic 50/50 Polo', cost: 8.73 },
+    hoodie: { label: 'Basic Hoodie', cost: 13.59 },
   },
   quantityBreaks: [
     { value: '1-5', label: '1-5 pieces', multiplier: 2.1 },
@@ -210,10 +210,14 @@ const createDefaultForm = () => ({
 })
 
 const GARMENT_NOTES = {
-  standard: 'Reliable everyday blank for straightforward crew orders.',
-  soft: 'Softer hand-feel for retail-style shirts and premium teams.',
-  polo: 'Polished option for staff uniforms, golf events, and front chest logos.',
-  hoodie: 'Heavier cold-weather piece with room for front, back, and sleeve hits.',
+  standard:
+    'A dependable, budget-friendly classic tee built for everyday wear. Durable cotton construction makes it ideal for straightforward prints and long-lasting use.',
+  soft:
+    'A lighter, softer tee with a modern fit and smooth finish. Offers a more premium feel while maintaining everyday versatility.',
+  polo:
+    'A clean, professional polo made from a cotton/poly blend for durability and easy care. Holds its shape well with a polished, consistent look.',
+  hoodie:
+    'A comfortable, midweight hoodie designed for warmth and everyday wear. Great for layering with a soft interior and relaxed fit.',
 }
 
 const DEFAULT_GRAPHICS = {
