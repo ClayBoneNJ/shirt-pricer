@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import packageJson from '../package.json'
-import { toBlob } from 'html-to-image'
 
 const PRICING_CONFIG = {
   blankPrices: {
@@ -39,8 +38,7 @@ const APP_VERSION = formatAppVersion(packageJson.version)
 const MINIMUM_EFFECTIVE_MULTIPLIER = 2
 const MULTIPLIER_FLOOR_UNLOCK_TIERS = new Set(['24-47', '48-71', '72+'])
 const QUOTE_EXPORT_WIDTH = 1180
-const QUOTE_EXPORT_MIN_HEIGHT = 820
-const QUOTE_EXPORT_CLASS = 'quote-mock-export'
+const QUOTE_EXPORT_HEIGHT = 820
 const ABSOLUTE_MINIMUM_UNIT_PRICE = 8.75
 const PRICING_PRESETS = {
   budget: {
@@ -522,6 +520,7 @@ const loadImageFile = (file) =>
 const loadImageFromSrc = (src) =>
   new Promise((resolve, reject) => {
     const image = new Image()
+    image.crossOrigin = 'anonymous'
 
     image.onload = () => resolve(image)
     image.onerror = () => reject(new Error(`Unable to load image: ${src}`))
@@ -1387,29 +1386,317 @@ function App() {
       return null
     }
 
-    const exportNode = quoteMockRef.current
-    exportNode.classList.add(QUOTE_EXPORT_CLASS)
+    const canvas = document.createElement('canvas')
+    const pixelRatio = 2
+    canvas.width = QUOTE_EXPORT_WIDTH * pixelRatio
+    canvas.height = QUOTE_EXPORT_HEIGHT * pixelRatio
+
+    const context = canvas.getContext('2d')
+
+    if (!context) {
+      return null
+    }
+
+    context.scale(pixelRatio, pixelRatio)
+
+    const drawSoftPanel = (x, y, width, height, radius, fillStyle, shadowBlur = 0) => {
+      context.save()
+      context.fillStyle = fillStyle
+      context.strokeStyle = 'rgba(17, 24, 39, 0.08)'
+      context.lineWidth = 1
+      context.shadowColor = 'rgba(15, 23, 42, 0.14)'
+      context.shadowBlur = shadowBlur
+      context.shadowOffsetY = shadowBlur > 0 ? 12 : 0
+      drawRoundedRect(context, x, y, width, height, radius)
+      context.fill()
+      context.shadowColor = 'transparent'
+      context.stroke()
+      context.restore()
+    }
+
+    const pillFont = '700 14px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+    const labelFont = '900 15px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+    const bodyFont = '500 18px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+    const miniLabelFont = '700 13px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+
+    const drawPill = (x, y, text) => {
+      context.save()
+      context.font = pillFont
+      const metrics = context.measureText(text)
+      const width = metrics.width + 26
+      drawSoftPanel(x, y, width, 28, 999, 'rgba(15, 23, 42, 0.08)')
+      context.fillStyle = '#334155'
+      context.textBaseline = 'middle'
+      context.fillText(text, x + 13, y + 14)
+      context.restore()
+      return width
+    }
+
+    const drawCaptionPill = (centerX, y, text) => {
+      context.save()
+      context.font = labelFont
+      const width = context.measureText(text).width + 28
+      drawSoftPanel(centerX - width / 2, y, width, 36, 999, 'rgba(255, 255, 255, 0.96)', 18)
+      context.fillStyle = '#111827'
+      context.textBaseline = 'middle'
+      context.fillText(text, centerX - width / 2 + 14, y + 18)
+      context.restore()
+    }
+
+    const drawWrappedText = (text, x, y, maxWidth, lineHeight, maxLines = 2) => {
+      const words = text.split(/\s+/)
+      const lines = []
+      let currentLine = ''
+
+      words.forEach((word) => {
+        const nextLine = currentLine ? `${currentLine} ${word}` : word
+        if (context.measureText(nextLine).width <= maxWidth || !currentLine) {
+          currentLine = nextLine
+        } else if (lines.length < maxLines - 1) {
+          lines.push(currentLine)
+          currentLine = word
+        }
+      })
+
+      if (currentLine) {
+        lines.push(currentLine)
+      }
+
+      lines.slice(0, maxLines).forEach((line, index) => {
+        context.fillText(line, x, y + index * lineHeight)
+      })
+    }
+
+    const drawMockupCard = ({
+      shirtImage,
+      shirtBounds,
+      overlayImageMap,
+      cardX,
+      cardY,
+      cardWidth,
+      cardHeight,
+      cardRotation,
+      view,
+    }) => {
+      context.save()
+      context.translate(cardX + cardWidth / 2, cardY + cardHeight / 2)
+      context.rotate((cardRotation * Math.PI) / 180)
+      context.shadowColor = 'rgba(0, 0, 0, 0.18)'
+      context.shadowBlur = 24
+      context.shadowOffsetY = 10
+      drawContainedImage(
+        context,
+        shirtImage,
+        -cardWidth / 2,
+        -cardHeight / 2,
+        cardWidth,
+        cardHeight,
+        0,
+        shirtBounds,
+      )
+      context.shadowColor = 'transparent'
+
+      Object.entries(GRAPHIC_LAYOUTS).forEach(([field, config]) => {
+        if (config.view !== view || !form.printLocations[field] || !graphics[field] || !overlayImageMap[field]) {
+          return
+        }
+
+        const placement = graphicPlacements[field] ?? config
+        const overlayX = -cardWidth / 2 + (placement.x / 100) * cardWidth
+        const overlayY = -cardHeight / 2 + (placement.y / 100) * cardHeight
+        const overlayWidth = (placement.width / 100) * cardWidth
+        drawOverlayImage(context, overlayImageMap[field], overlayX, overlayY, overlayWidth, placement.rotation)
+      })
+
+      context.restore()
+    }
 
     try {
-      const exportHeight = Math.max(QUOTE_EXPORT_MIN_HEIGHT, exportNode.scrollHeight)
+      const loadOptionalImage = async (src) => {
+        if (!src) {
+          return null
+        }
 
-      return await toBlob(exportNode, {
-        backgroundColor: '#111827',
-        cacheBust: true,
-        pixelRatio: 2,
-        quality: 0.95,
-        type: 'image/jpeg',
-        width: QUOTE_EXPORT_WIDTH,
-        height: exportHeight,
-        canvasWidth: QUOTE_EXPORT_WIDTH,
-        canvasHeight: exportHeight,
-        style: {
-          width: `${QUOTE_EXPORT_WIDTH}px`,
-          maxWidth: 'none',
-        },
+        try {
+          return await loadImageFromSrc(src)
+        } catch {
+          return null
+        }
+      }
+
+      const overlayImages = Object.fromEntries(
+        await Promise.all(
+          Object.entries(graphics).map(async ([field, graphic]) => [
+            field,
+            await loadOptionalImage(graphic?.url),
+          ]),
+        ),
+      )
+
+      const [backgroundImage, logoImage, frontShirtImage, backShirtImage, frontWatermarkImage, backWatermarkImage] =
+        await Promise.all([
+          loadOptionalImage(quoteBackgroundSrc),
+          loadOptionalImage(`${ASSET_BASE_URL}company-logo.png`),
+          loadOptionalImage(selection.shirtColor.frontImage),
+          loadOptionalImage(selection.shirtColor.backImage),
+          loadOptionalImage(mockFrontGraphic?.url),
+          loadOptionalImage(mockBackGraphic?.url),
+        ])
+
+      const frontShirtBounds = frontShirtImage ? getOpaqueImageBounds(frontShirtImage) : null
+      const backShirtBounds = backShirtImage ? getOpaqueImageBounds(backShirtImage) : null
+
+      context.fillStyle = '#111827'
+      context.fillRect(0, 0, QUOTE_EXPORT_WIDTH, QUOTE_EXPORT_HEIGHT)
+
+      if (backgroundImage) {
+        const adjustedBackground = getAdjustedBackgroundCanvas(backgroundImage, QUOTE_EXPORT_WIDTH, QUOTE_EXPORT_HEIGHT, {
+          hueRotation: quoteHueRotation,
+          saturation: 1.35,
+          brightness: 0.72,
+          contrast: 1.08,
+        })
+
+        context.save()
+        context.globalAlpha = 0.72
+        context.drawImage(
+          adjustedBackground,
+          -QUOTE_EXPORT_WIDTH * 0.04,
+          -QUOTE_EXPORT_HEIGHT * 0.04,
+          QUOTE_EXPORT_WIDTH * 1.08,
+          QUOTE_EXPORT_HEIGHT * 1.08,
+        )
+        context.restore()
+      }
+
+      const accentGlow = context.createRadialGradient(0, 0, 0, 0, 0, QUOTE_EXPORT_WIDTH * 0.42)
+      accentGlow.addColorStop(0, `rgba(${quoteAccentCss}, 0.34)`)
+      accentGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      context.fillStyle = accentGlow
+      context.fillRect(0, 0, QUOTE_EXPORT_WIDTH, QUOTE_EXPORT_HEIGHT)
+
+      const baseGlow = context.createRadialGradient(
+        QUOTE_EXPORT_WIDTH,
+        QUOTE_EXPORT_HEIGHT,
+        0,
+        QUOTE_EXPORT_WIDTH,
+        QUOTE_EXPORT_HEIGHT,
+        QUOTE_EXPORT_WIDTH * 0.48,
+      )
+      baseGlow.addColorStop(0, `rgba(${quoteBaseCss}, 0.24)`)
+      baseGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      context.fillStyle = baseGlow
+      context.fillRect(0, 0, QUOTE_EXPORT_WIDTH, QUOTE_EXPORT_HEIGHT)
+
+      if (logoImage) {
+        context.save()
+        context.globalAlpha = 0.12
+        drawContainedImage(context, logoImage, -60, 560, 440, 440, -8)
+        context.restore()
+      }
+
+      if (frontWatermarkImage) {
+        context.save()
+        context.globalAlpha = 0.3
+        drawContainedImage(context, frontWatermarkImage, 740, 50, 400, 280, 14)
+        context.restore()
+      }
+
+      if (backWatermarkImage) {
+        context.save()
+        context.globalAlpha = 0.2
+        drawContainedImage(context, backWatermarkImage, 835, 510, 290, 230, 14)
+        context.restore()
+      }
+
+      drawSoftPanel(24, 18, 480, 122, 22, 'rgba(255, 255, 255, 0.96)', 24)
+
+      if (logoImage) {
+        drawContainedImage(context, logoImage, -6, -8, 170, 170)
+      }
+
+      const titleX = 188
+      const titleY = 56
+      let titleFontSize = 34
+      while (titleFontSize > 24) {
+        context.font = `700 ${titleFontSize}px system-ui, -apple-system, BlinkMacSystemFont, sans-serif`
+        if (context.measureText(quoteHeaderName).width <= 286) {
+          break
+        }
+        titleFontSize -= 1
+      }
+      context.fillStyle = '#111827'
+      context.textBaseline = 'top'
+      context.fillText(quoteHeaderName, titleX, titleY)
+
+      let pillX = titleX
+      const pillY = 101
+      ;[selection.garmentLabel, `${selection.quantity} pieces`, quotePlacementSummary].forEach((text, index) => {
+        const pillWidth = drawPill(pillX, pillY, text)
+        pillX += pillWidth + (index < 2 ? 10 : 0)
       })
-    } finally {
-      exportNode.classList.remove(QUOTE_EXPORT_CLASS)
+
+      if (frontShirtImage) {
+        drawMockupCard({
+          shirtImage: frontShirtImage,
+          shirtBounds: frontShirtBounds,
+          overlayImageMap: overlayImages,
+          cardX: 88,
+          cardY: 152,
+          cardWidth: 410,
+          cardHeight: 450,
+          cardRotation: -5,
+          view: 'front',
+        })
+      }
+
+      if (backShirtImage) {
+        drawMockupCard({
+          shirtImage: backShirtImage,
+          shirtBounds: backShirtBounds,
+          overlayImageMap: overlayImages,
+          cardX: 678,
+          cardY: 152,
+          cardWidth: 410,
+          cardHeight: 450,
+          cardRotation: 5,
+          view: 'back',
+        })
+      }
+
+      drawCaptionPill(344, 575, 'FRONT')
+      drawCaptionPill(847, 575, 'BACK')
+
+      drawSoftPanel(20, 672, 1140, 128, 28, 'rgba(255, 255, 255, 0.96)', 20)
+
+      const infoColumns = [
+        { x: 40, label: 'GARMENT', value: selection.garmentLabel, note: selection.garmentNote, width: 320 },
+        { x: 400, label: 'PRICE PER GARMENT', value: formatMoney(selection.unitPrice), width: 220 },
+        { x: 655, label: 'QUANTITY', value: String(selection.quantity), width: 160 },
+        { x: 910, label: 'TOTAL PRICE', value: formatMoney(selection.customerPrice), width: 220 },
+      ]
+
+      infoColumns.forEach(({ x, label, value, note, width }) => {
+        context.save()
+        context.textBaseline = 'top'
+        context.fillStyle = 'rgba(17, 24, 39, 0.7)'
+        context.font = miniLabelFont
+        context.fillText(label, x, 694)
+        context.fillStyle = '#111827'
+        context.font = '700 28px system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+        context.fillText(value, x, 728)
+        if (note) {
+          context.fillStyle = 'rgba(17, 24, 39, 0.8)'
+          context.font = bodyFont
+          drawWrappedText(note, x, 767, width, 22)
+        }
+        context.restore()
+      })
+
+      return await canvasToBlob(canvas, 'image/jpeg', 0.95)
+    } catch (error) {
+      console.error('Unable to build quote mock JPG.', error)
+      return null
     }
   }
 
