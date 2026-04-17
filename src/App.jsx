@@ -1596,15 +1596,15 @@ function App() {
 
       if (frontWatermarkImage) {
         context.save()
-        context.globalAlpha = 0.34
-        drawContainedImage(context, frontWatermarkImage, 700, 28, 500, 360, 14)
+        context.globalAlpha = 0.38
+        drawContainedImage(context, frontWatermarkImage, 610, -6, 620, 440, 14)
         context.restore()
       }
 
       if (backWatermarkImage) {
         context.save()
-        context.globalAlpha = 0.24
-        drawContainedImage(context, backWatermarkImage, 812, 470, 390, 310, 14)
+        context.globalAlpha = 0.28
+        drawContainedImage(context, backWatermarkImage, 760, 388, 540, 430, 14)
         context.restore()
       }
 
